@@ -1,15 +1,12 @@
 package net.ysq.webchat.po;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 
 @Table(name = "user")
 public class User {
-    /**
-     * 用户登录状态的token
-     */
-    @Transient // 映射数据表实体类时，忽略此属性
+
+    // 注意包不要导入错误了：javax.persistence.Transient;
+    @Transient
     private String token;
 
     @Id
@@ -21,14 +18,18 @@ public class User {
     private String phone;
 
     /**
-     * 用户名，账号
+     * 0：男；1：女；2：保密
+     */
+    private Byte sex;
+
+    /**
+     * 用户名，账号，慕信号
      */
     private String username;
 
     /**
      * 密码
      */
-    @JsonIgnore
     private String password;
 
     /**
@@ -39,6 +40,11 @@ public class User {
 
     @Column(name = "face_image_big")
     private String faceImageBig;
+
+    /**
+     * 个性签名
+     */
+    private String description;
 
     /**
      * 昵称
@@ -53,7 +59,6 @@ public class User {
     /**
      * 设备标识码
      */
-    @JsonIgnore
     private String cid;
 
     public String getToken() {
@@ -94,6 +99,24 @@ public class User {
      */
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    /**
+     * 获取0：男；1：女；2：保密
+     *
+     * @return sex - 0：男；1：女；2：保密
+     */
+    public Byte getSex() {
+        return sex;
+    }
+
+    /**
+     * 设置0：男；1：女；2：保密
+     *
+     * @param sex 0：男；1：女；2：保密
+     */
+    public void setSex(Byte sex) {
+        this.sex = sex;
     }
 
     /**
@@ -162,6 +185,24 @@ public class User {
      */
     public void setFaceImageBig(String faceImageBig) {
         this.faceImageBig = faceImageBig;
+    }
+
+    /**
+     * 获取个性签名
+     *
+     * @return description - 个性签名
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * 设置个性签名
+     *
+     * @param description 个性签名
+     */
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     /**

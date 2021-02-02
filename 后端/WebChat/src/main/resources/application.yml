@@ -85,4 +85,10 @@ mybatis:
     # 增加sql语句打印，用于本地开发测试
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
+# 分页插件
+pagehelper:
+  helper-dialect: mysql
+  #  params: =count=countSql
+  reasonable: true
+  support-methods-arguments: true
 

@@ -20,9 +20,6 @@
 			.icon-_adduser {
 				font-size: 20px;
 			}
-			.mui-media-body {
-				margin-right: 40px;
-			}
 		</style>
 		
 	</head>
@@ -44,37 +41,17 @@
 		
 		<div class="mui-scroll-wrapper">
 			<div class="mui-scroll">
-				<ul class="mui-table-view">
-					<li class="mui-table-view-cell mui-media">
+				<ul id="userList"  class="mui-table-view">
+					<!-- <li class="mui-table-view-cell mui-media">
 						<a href="javascript:;">
 							<img class="mui-media-object mui-pull-left" src="../imgs/face-cat.jpg">
 							<div class="mui-media-body">
 								标题
 								<p class="mui-ellipsis">能和心爱的人一起睡觉，是件幸福的事情；可是，打呼噜怎么办？</p>
 							</div>
-							<button type="button" class="mui-btn add-btn">
-								<span class="iconfont icon-_adduser"></span>
-							</button>
+							
 						</a>
-					</li>
-					<li class="mui-table-view-cell mui-media">
-						<a href="javascript:;">
-							<img class="mui-media-object mui-pull-left" src="../imgs/face-cat.jpg">
-							<div class="mui-media-body">
-								木屋
-								<p class="mui-ellipsis">想要这样一间小木屋，夏天挫冰吃瓜，冬天围炉取暖.</p>
-							</div>
-						</a>
-					</li>
-					<li class="mui-table-view-cell mui-media">
-						<a href="javascript:;">
-							<img class="mui-media-object mui-pull-left" src="../imgs/face-cat.jpg">
-							<div class="mui-media-body">
-							    CBD
-								<p class="mui-ellipsis">烤炉模式的城，到黄昏，如同打翻的调色盘一般.</p>
-							</div>
-						</a>
-					</li>
+					</li> -->
 				</ul>
 			</div>
 		</div>
@@ -85,17 +62,68 @@
 			mui.init();
 			mui.plusReady(function () {
 				// 强制弹出软键盘
-				// app.popUpKeybord();
+				app.popUpKeybord();
 				
 				var words = document.getElementById("words");
 				document.getElementById("search").addEventListener("tap", function() {
+					if (!app.isNotBlank(words.value)) {
+						words.focus();
+						return;
+					}
+					userList.innerHTML = '';
+					document.activeElement.blur();//收起虚拟键盘
 					app.ajax("user/search", {
 						words: words.value
 					}, function(res) {
-						
+						var users = res.data;
+						if (users.length == 0) {
+							app.showToast("搜索不到用户", "error");
+						} else {
+							refreshUserList(users);
+						}
 					}, "get");
 				});
+				
+				// li的事件绑定
+				mui('#userList').on('tap', 'li', function() {
+				   var userId = this.getAttribute("id");
+				   console.log(userId);
+				   app.ajax("friend/isFriend", {
+					   userId: userId
+				   }, function(res) {
+					   if (res.data === true) {
+						   app.showToast("已经是好友，跳转到聊天列表");
+					   } else {
+						   app.showToast("不是好友，跳转到好友申请页面");
+						   mui.openWindow({
+							   url: "add_friend.html",
+							   id: "add_friend",
+							   extras: {
+								   receiverId: userId
+							   }
+						   });
+					   }
+				   }, "get");
+				});
 			});
+			
+			function refreshUserList(users) {
+				var userList = document.getElementById("userList");
+				var html = "";
+				for(var i=0; i<users.length; i++) {
+					if (!app.isNotBlank(users[i].description)) {
+						users[i].description = '暂无个性签名';
+					}
+					html += 
+					("<li id='" + users[i].id + "' class='mui-table-view-cell mui-media'>" + 
+						"<a href='javascript:;'>" +
+							"<img class='mui-media-object mui-pull-left'' src='" + users[i].faceImage +"'>" +
+							"<div class='mui-media-body'>" +
+								users[i].username +
+								"<p class='mui-ellipsis'>" + users[i].description + "</p></div></a></li>");
+				}
+				userList.innerHTML = html;
+			}
 			
 		</script>
 	</body>

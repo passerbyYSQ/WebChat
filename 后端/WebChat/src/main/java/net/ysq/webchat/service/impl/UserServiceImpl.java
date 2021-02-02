@@ -11,11 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.ObjectUtils;
+import tk.mybatis.mapper.entity.Example;
+import tk.mybatis.mapper.util.Sqls;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -81,6 +84,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getUserById(String userId) {
+        return userMapper.selectByPrimaryKey(userId);
+    }
+
+    @Override
+    public List<User> getUserLikeUsername(String username) {
+        Example example = Example.builder(User.class)
+                .where(Sqls.custom().andLike("username", "%" + username + "%"))
+                .build();
+        return userMapper.selectByExample(example);
+    }
+
+    @Override
     public User getUserByUsername(String username) {
         User cond = new User();
         cond.setUsername(username);
@@ -107,7 +123,8 @@ public class UserServiceImpl implements UserService {
         user.setUsername(userId); // 将userId作为初始化的username
         user.setPassword(md5Pwd);
         user.setCid(vo.getCid());
-        user.setQrcode(qrCodeUrl);
+        user.setSex((byte) 3); // 性别：保密
+        user.setQrcode(qrCodeUrl); // 二维码
 
         int cnt = userMapper.insertSelective(user);
 

@@ -92,7 +92,7 @@
         -->
 <!--        <table tableName="fs"  domainObjectName="FS" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>-->
         <!-- 谨慎【覆盖】，小心重新生成覆盖导致xml中自己写的sql语句全部没有了 -->
-        <table tableName="chat_msg"/>
+<!--        <table tableName="chat_msg"/>-->
         <table tableName="friend_request"/>
         <table tableName="my_friend"/>
         <table tableName="user"/>

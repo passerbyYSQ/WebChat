@@ -8,6 +8,23 @@
     <id column="id" jdbcType="VARCHAR" property="id" />
     <result column="send_user_id" jdbcType="VARCHAR" property="sendUserId" />
     <result column="accept_user_id" jdbcType="VARCHAR" property="acceptUserId" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="status" jdbcType="TINYINT" property="status" />
     <result column="request_date_time" jdbcType="TIMESTAMP" property="requestDateTime" />
   </resultMap>
+
+<!-- 在yml中配置了扫描的包路径是po包下，而FriendRequestCard在vo包下，所以需要写全路径  -->
+  <select id="getFriendRequestList" parameterType="String" resultType="net.ysq.webchat.vo.FriendRequestCard">
+        select
+            r.id,
+            r.content,
+            r.status,
+            u.username senderUsername,
+            u.face_image senderFaceImg
+        from friend_request r, user u
+        where r.accept_user_id=#{receiverId} and
+              r.send_user_id=u.id
+        order by request_date_time desc
+  </select>
+
 </mapper>

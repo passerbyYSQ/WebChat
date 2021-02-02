@@ -8,5 +8,7 @@
     <id column="id" jdbcType="VARCHAR" property="id" />
     <result column="my_user_id" jdbcType="VARCHAR" property="myUserId" />
     <result column="my_friend_user_id" jdbcType="VARCHAR" property="myFriendUserId" />
+    <result column="remarks_name" jdbcType="VARCHAR" property="remarksName" />
+    <result column="added_date_time" jdbcType="TIMESTAMP" property="addedDateTime" />
   </resultMap>
 </mapper>

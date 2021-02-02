@@ -3,6 +3,8 @@ package net.ysq.webchat.service;
 import net.ysq.webchat.po.User;
 import net.ysq.webchat.vo.LoginReqVo;
 
+import java.util.List;
+
 /**
  * @author passerbyYSQ
  * @create 2021-01-29 0:36
@@ -28,7 +30,18 @@ public interface UserService {
     User getUserByPhone(String phone);
 
     /**
-     * 根据用户名查找用户
+     * 根据id查找用户
+     */
+    User getUserById(String userId);
+
+    /**
+     * 根据用户名进行模糊匹配
+     * @return
+     */
+    List<User> getUserLikeUsername(String username);
+
+    /**
+     * 根据用户名精确查找用户
      */
     User getUserByUsername(String username);
 

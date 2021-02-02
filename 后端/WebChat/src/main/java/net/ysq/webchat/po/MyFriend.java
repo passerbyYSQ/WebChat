@@ -1,6 +1,9 @@
 package net.ysq.webchat.po;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import java.time.LocalDateTime;
 
 @Table(name = "my_friend")
 public class MyFriend {
@@ -18,6 +21,18 @@ public class MyFriend {
      */
     @Column(name = "my_friend_user_id")
     private String myFriendUserId;
+
+    /**
+     * 备注名
+     */
+    @Column(name = "remarks_name")
+    private String remarksName;
+
+    /**
+     * 成功添加为好友的时间
+     */
+    @Column(name = "added_date_time")
+    private LocalDateTime addedDateTime;
 
     /**
      * @return id
@@ -67,5 +82,41 @@ public class MyFriend {
      */
     public void setMyFriendUserId(String myFriendUserId) {
         this.myFriendUserId = myFriendUserId;
+    }
+
+    /**
+     * 获取备注名
+     *
+     * @return remarks_name - 备注名
+     */
+    public String getRemarksName() {
+        return remarksName;
+    }
+
+    /**
+     * 设置备注名
+     *
+     * @param remarksName 备注名
+     */
+    public void setRemarksName(String remarksName) {
+        this.remarksName = remarksName;
+    }
+
+    /**
+     * 获取成功添加为好友的时间
+     *
+     * @return added_date_time - 成功添加为好友的时间
+     */
+    public LocalDateTime getAddedDateTime() {
+        return addedDateTime;
+    }
+
+    /**
+     * 设置成功添加为好友的时间
+     *
+     * @param addedDateTime 成功添加为好友的时间
+     */
+    public void setAddedDateTime(LocalDateTime addedDateTime) {
+        this.addedDateTime = addedDateTime;
     }
 }

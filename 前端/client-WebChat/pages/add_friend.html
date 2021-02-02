@@ -6,6 +6,7 @@
 		<title></title>
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 		<link href="../css/mui.min.css" rel="stylesheet" />
+		<link href="../font_icon/iconfont.css" rel="stylesheet" />
 		<link href="../css/common.css" rel="stylesheet" />
 		
 		<style type="text/css">
@@ -26,10 +27,13 @@
 		
 		<div class="mui-content">
 			<div class="content-box">
-				<textarea class="mui-input-clear"></textarea>
+				<textarea></textarea>
 			</div>
 			<div class="mui-content-padded">
-				<button class="mui-btn mui-btn-green mui-btn-block">发送好友申请</button>
+				<button class="mui-btn mui-btn-green mui-btn-block">
+					<span class="iconfont icon-_adduser" style="font-size: 20px;"></span>
+					<span style="font-size: 18px;">发送好友申请</span>
+				</button>
 			</div>
 		</div>
 
@@ -38,6 +42,13 @@
 		<script src="../js/app.js"></script>
 		<script type="text/javascript">
 			mui.init();
+			
+			mui.plusReady(function () {
+				var curView = plus.webview.currentWebview();
+				var receiverId = curView.receiverId;
+				console.log("这是add_friend页面，userId=" + receiverId);
+			});
+			
 		</script>
 	</body>
 

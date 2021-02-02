@@ -7,10 +7,12 @@
     -->
     <id column="id" jdbcType="VARCHAR" property="id" />
     <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="sex" jdbcType="TINYINT" property="sex" />
     <result column="username" jdbcType="VARCHAR" property="username" />
     <result column="password" jdbcType="VARCHAR" property="password" />
     <result column="face_image" jdbcType="VARCHAR" property="faceImage" />
     <result column="face_image_big" jdbcType="VARCHAR" property="faceImageBig" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
     <result column="nickname" jdbcType="VARCHAR" property="nickname" />
     <result column="qrcode" jdbcType="VARCHAR" property="qrcode" />
     <result column="cid" jdbcType="VARCHAR" property="cid" />
