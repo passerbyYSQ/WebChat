@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<link href="../css/common.css" rel="stylesheet" />
+		
+		<style type="text/css">
+			img.mui-media-object {
+				width: 24px !important;
+				height: 24px !important;
+				margin-right: 16px !important;
+			}
+			div.mui-media-body {
+				height: 24px;
+				line-height: 24px;
+			}
+		</style>
+		
+	</head>
+	
+		<header class="mui-bar mui-bar-nav">
+			<h1 class="mui-title">发现</h1>
+		</header>
+		
+		<div class="mui-content">
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell mui-media">
+					<a href="javascript:;">
+						<img class="mui-media-object mui-pull-left" src="../imgs/friends.png">
+						<div class="mui-media-body">朋友圈</div>
+					</a>
+				</li>
+			</ul>
+			<ul class="mui-table-view" style="margin-top: 16px;">
+				<li id="add_friend" class="mui-table-view-cell mui-media">
+					<a href="javascript:;">
+						<img class="mui-media-object mui-pull-left" src="../imgs/addfriends.png">
+						<div class="mui-media-body">添加好友</div>
+					</a>
+				</li>
+				<li id="scan_qrcode" class="mui-table-view-cell mui-media">
+					<a href="javascript:;">
+						<img class="mui-media-object mui-pull-left" src="../imgs/scanscan.png">
+						<div class="mui-media-body">扫一扫</div>
+					</a>
+				</li>
+			</ul>
+		</div>
+
+	<body>
+		<script src="../js/mui.min.js"></script>
+		<script type="text/javascript">
+			mui.init();
+			
+			document.getElementById("add_friend").addEventListener("tap", function() {
+				mui.openWindow("search_friend.html", "search_friend");
+			});
+			
+			document.getElementById("scan_qrcode").addEventListener("tap", function() {
+				mui.openWindow("scan_qrcode.html", "scan_qrcode");
+			});
+			
+			
+		</script>
+	</body>
+
+</html>

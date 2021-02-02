@@ -1,0 +1,161 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<link href="../css/common.css" rel="stylesheet" />
+		
+		<style type="text/css">
+			/* 右箭头的样式 */
+			.mui-icon-arrowright {
+				color: darkgray;
+				margin-right: -6px;
+				margin-left: 4px;
+			}
+			/* 中间内容字体 */
+			.mid-content {
+				display: inline-block;
+				max-width: 64%;
+				white-space:nowrap;
+				overflow:hidden;
+				text-overflow:ellipsis;
+				color: dimgray;
+			}
+			/* 头像样式微调 */
+			.mui-media-object {
+				width: 52px;
+				max-width: 52px !important;
+				height: 52px !important;
+				border-radius: 4px;
+			}
+			#qrcode {
+				height: 32px;
+			}
+		</style>
+		
+	</head>
+	
+		<header class="mui-bar mui-bar-nav">
+			<h1 class="mui-title">个人信息</h1>
+		</header>
+		
+		<div class="mui-content">
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell mui-media">
+					<a id="faceImageLink" href="javascript:;">
+						<span class="mui-pull-left" style="line-height: 42px;">头像</span>
+						<span class="mui-icon mui-icon-arrowright mui-pull-right" style="line-height: 42px;"></span>
+						<img id="faceImage" class="mui-media-object mui-pull-right" src="../imgs/face-cat.jpg">
+					</a>
+				</li>
+				<li class="mui-table-view-cell mui-media">
+					<a href="javascript:;" style="line-height: 24px;">
+						<span class="mui-pull-left">手机号</span>
+						<span class="mui-icon mui-icon-arrowright mui-pull-right"></span>
+						<span id="phone" class="mui-pull-right mid-content">1857578434518575757843451857578434518575784345</span>
+					</a>
+				</li>
+				<li class="mui-table-view-cell mui-media">
+					<a id="usernameLink" href="javascript:;" style="line-height: 24px;">
+						<span class="mui-pull-left">用户名</span>
+						<span class="mui-icon mui-icon-arrowright mui-pull-right"></span>
+						<span id="username" class="mid-content mui-pull-right">王小明王小明王小明王小明王小明王小明</span>
+					</a>
+				</li>
+				<li class="mui-table-view-cell mui-media">
+					<a id="qrcodeLink" href="javascript:;">
+						<span class="mui-pull-left" style="line-height: 32px;">二维码</span>
+						<span class="mui-icon mui-icon-arrowright mui-pull-right" style="line-height: 32px;"></span>
+						<img id="qrcode" class="mui-pull-right" src="../imgs/qrcode.png">
+					</a>
+				</li>
+			</ul>
+			<ul class="mui-table-view" style="margin-top: 8px;">
+				<li class="mui-table-view-cell mui-media" style="height: 52px; text-align: center;">
+					<a href="javascript:;" id="logout" style="text-align: center; line-height: 28px;">退出登录</a>
+				</li>
+			</ul>
+		</div>
+
+	<body>
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/app.js"></script>
+		<script type="text/javascript">
+			mui.init();
+			
+			mui.plusReady(function() {
+			    var curWebview = plus.webview.currentWebview();
+				var user = app.getUserGlobalInfo();
+				curWebview.addEventListener("show", function() {
+					refreshUserInfo(user);
+				});
+				
+				// 点击头像的<li>
+				document.getElementById("faceImageLink").addEventListener("tap", function() {
+					// 传参失败
+					// mui.openWindow("photo.html", "photo", {
+					// 	photoUrl: "../imgs/face-cat.jpg"
+					// });
+					mui.openWindow({ url: "face_img.html", id: "face_img"});
+				});
+				
+				/* 修改用户名 */
+				document.getElementById("usernameLink").addEventListener("tap", function() {
+					app.showPrompt("用户名", user.username, function(val) {
+						if (val === user.username) {
+							return;
+						}
+						
+						app.ajax("user/username", {
+							username: val
+						}, function(res) {
+							// 刷新页面。有问题，老师尚未jie解决！！！
+							user.username = val;
+							app.setUserGlobalInfo(user);
+							// mui.fire(curWebview, "refresh");
+						}, "post");
+					});
+				});
+				
+				// 二维码的点击事件
+				document.getElementById("qrcodeLink").addEventListener("tap", function() {
+					mui.openWindow("my_qrcode.html", "my_qrcode");
+				});
+				
+				// 退出登录的点击事件
+				document.getElementById("logout").addEventListener("tap", function() {
+					logout();
+				});
+			});
+			
+			function logout() {
+				app.ajax("user/logout", null, function(res) {
+					mui.openWindow({
+						url: 'login.html',
+						id: 'login'
+					});
+				}, "post")
+			}
+			
+			// 刷新用户信息
+			function refreshUserInfo(user) {
+				
+				console.log("个人信息页面");
+				
+				document.getElementById("phone").innerHTML = user.phone;
+				document.getElementById("username").innerHTML = user.username;
+				
+				if (app.isNotBlank(user.faceImage)) {
+					document.getElementById("faceImage").src = user.faceImage; // 阿里oss
+				}
+				if (app.isNotBlank(user.qrcode)) {
+					document.getElementById("qrcode").src = user.qrcode;
+				}
+			}
+		</script>
+	</body>
+
+</html>

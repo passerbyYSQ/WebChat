@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<link href="../font_icon/iconfont.css" rel="stylesheet" >
+		<style type="text/css">
+			
+			.box {
+				width: 90%;
+				background-color: white;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translateX(-50%) translateY(-50%);
+				border-radius: 8px;
+				padding: 16px;
+				box-shadow: 0 0 10px #ddd;
+			}
+			#photo {
+				width: 52px;
+				height: 52px;
+				border-radius: 4px;
+				margin-right: 16px;
+			}
+			#username {
+				line-height: 52px;
+				font-size: 20px;
+			}
+			#qrcode {
+				width: 100%;
+			}
+			.tip {
+				color: darkgray;
+				font-size: 14px;
+			}
+		</style>
+	</head>
+	<body>
+		
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">二维码名片</h1>
+			<a id="downloadLink" class="mui-icon iconfont icon-baocun mui-pull-right"></a>
+		</header>
+		
+		<div class="mui-content">
+			<div class="box">
+				<div class="head">
+					<img id="photo" src="../imgs/face-cat.jpg" alt="" style="float: left;">
+					<span id="username" style="display: block; float: left;">王小明</span>
+					<div style="clear: both;"></div>
+				</div>
+				<div style="padding: 8px 0;">
+					<img id="qrcode" src="../imgs/my_qrcode.png" alt="">
+				</div>
+				<div style="text-align: center;">
+					<span class="tip">扫一扫上面的二维码，加我好友</span>
+				</div>
+			</div>
+		</div>
+		
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/app.js"></script>
+		<script type="text/javascript">
+			mui.init();
+			
+			mui.plusReady(function () {
+			    var user = app.getUserGlobalInfo();
+				refreshInfo(user);
+				
+				document.getElementById("downloadLink").addEventListener("tap", function() {
+					download(user.qrcode);
+				});
+			});
+			
+			function refreshInfo(user) {
+				if (app.isNotBlank(user.faceImage)) {
+					document.getElementById("photo").src = user.faceImage;
+				}
+				if (app.isNotBlank(user.qrcode)) {
+					document.getElementById("qrcode").src = user.qrcode;
+				}
+				document.getElementById("username").innerHTML = user.username;
+			}
+			
+			function download(qrcodeUrl) {
+				plus.nativeUI.showWaiting("下载中...");
+				var downloader = plus.downloader.createDownload(qrcodeUrl, {
+					
+				}, function(file, status) {
+					plus.nativeUI.closeWaiting();
+					if (status === 200) {
+						console.log(JSON.stringify(file));
+						// 保存至相册
+						plus.gallery.save(file.filename, function() {
+							app.showToast("二维码成功保存至相册", "success");
+						});
+					} else {
+						app.showToast("二维码下载失败: " + status, "error");
+					}
+				});
+				// 不要忘了start
+				downloader.start();
+			}
+			
+		</script>
+	</body>
+
+</html>

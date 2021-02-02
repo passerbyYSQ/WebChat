@@ -1,0 +1,135 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../../css/mui.min.css" rel="stylesheet" />
+		<link href="../../font_icon/iconfont.css" rel="stylesheet" >
+	</head>
+	
+	<style type="text/css">
+		html, body {
+			background-color: #666;
+			height: 100%;
+		}
+		.iconfont {
+			font-size: 24px;
+		}
+		.btnsGroup {
+			width: 100%;
+			list-style: none;
+			position: absolute;
+			bottom: 0;
+			display: flex;
+			flex-direction: row;
+		}
+		.btnsGroup > li {
+			width: 25%;
+			color: white;
+			line-height: 34px;
+		}
+		#view {
+			/* 一定要指定宽高 */
+			width: 100%;
+			height: 100%;
+			/* background-color: #2AC845; */
+			position: absolute;
+			top: 50%;
+			transform: translateY(-50%);
+		}
+	</style>
+	
+	<body>
+		<div class="mui-content">
+			<div id="view">
+			</div>
+		</div>
+		
+		<!-- 底部选项卡 -->
+		<ul class="btnsGroup">
+			<li><span id="cancel">取消</span></li>
+			<li><span id="nishizhen" class="iconfont icon-nishizhenxuanzhuan"></span></li>
+			<li><span id="shunshizhen" class="iconfont icon-shunshizhenxuanzhuan"></span></li>
+			<li><button id="ok" type="button" class="mui-btn mui-btn-green">确定</button></li>
+		</ul>
+		
+		<script src="../../js/mui.min.js"></script>
+		
+		<script src="js/iscroll-zoom-min.js"></script>
+		<script src="js/hammer.min.js"></script>
+		<script src="js/lrz.all.bundle.js"></script>
+		<script src="js/PhotoClip.js"></script>
+		
+		<script src="../../js/app.js"></script>
+		
+		<script type="text/javascript">
+			mui.init();
+			//app.initMyMui();
+			
+			mui.plusReady(function () {
+				var curWebView = plus.webview.currentWebview();
+				var photoUrl = curWebView.photoUrl; // 由上一个页面传入需要裁剪的原图的url
+				console.log(photoUrl);
+				var width = document.body.clientWidth * 0.8;
+				var loadingDialog;  // loading对话框对象
+			    var photoClip = new PhotoClip('#view', {
+						size: [width, width],
+			    		ok: '#ok',
+						img: photoUrl,
+						maxZoom: 2,
+			    		loadStart: function() {
+			    			loadingDialog = plus.nativeUI.showWaiting("加载图片中...");
+			    		},
+			    		loadComplete: function() {
+			    			loadingDialog.close();
+			    		},
+			    		done: function(dataURL) {
+							// 裁剪之后的图片的base64编码
+			    			console.log("裁剪成功"); 
+							app.ajax("user/faceImg", {
+								base64: dataURL
+							}, function(res) {
+								var user = app.getUserGlobalInfo();
+								user.faceImage = res.data.faceImage;
+								user.faceImageBig = res.data.faceImageBig;
+								app.setUserGlobalInfo(user);
+								// 刷新页面，有问题
+								// var faceImgView = plus.webview.getWebviewById("face_img");
+								// var meView = plus.webview.getWebviewById("me");
+								// mui.fire(faceImgView, "refresh");
+								// mui.fire(meView, "refresh");
+								mui.back();
+							}, "post");
+			    		},
+			    		fail: function(msg) {
+			    			app.showToast("裁剪出错：" + msg, "error");
+			    		}
+			    	});
+				
+				
+				document.getElementById("nishizhen").addEventListener("tap", function() {
+					/**
+					 * 图片旋转到指定角度
+					 * @param  {Number} angle      可选。旋转的角度
+					 * @param  {Number} duration   可选。旋转动画的时长，如果为 0 或 false，则表示没有过渡动画
+					 * @return {PhotoClip|Number}  返回 PhotoClip 的实例对象。如果参数为空，则返回当前的旋转角度
+					 */
+					photoClip.rotate(photoClip.rotate()-90, 200);
+				});
+				
+				document.getElementById("shunshizhen").addEventListener("tap", function() {
+					photoClip.rotate(photoClip.rotate()+90, 200);
+				});
+				
+				document.getElementById("cancel").addEventListener("tap", function() {
+					// curWebView.close();
+					mui.back();
+				});
+				
+			});
+		</script>
+	</body>
+
+</html>

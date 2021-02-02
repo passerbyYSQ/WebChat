@@ -1,0 +1,131 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		
+		<style>
+			html, body, .mui-content, .mui-input-group {
+			    height: 100%;
+				background-color: white;
+			}
+			.mui-input-row {
+				height: 48px !important;
+				padding: 8px 0;
+			}
+			.mui-input-row label {
+				width: 28%;
+			}
+			.mui-input-row label~input {
+				width: 72%;
+			}
+			.mui-icon-clear, .mui-icon-eye {
+				top: 16px !important;
+			}
+			.mui-content-padded {
+				margin: 16px 12px;
+			}
+			
+		</style>
+	</head>
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">登录/注册</h1>
+		</header>
+		<div class="mui-content">
+			<div class="mui-input-group">
+			    <div class="mui-input-row">
+			        <label for="phone">手机号</label>
+			        <input type="text" id="phone" name="phone" class="mui-input mui-input-clear" placeholder="请输入手机号">
+			    </div>
+			    <div class="mui-input-row">
+			        <label for="password">密码</label>
+			        <input type="password" id="password" name="password" class="mui-input mui-input-password" placeholder="密码不能少于6位">
+				</div>
+				<div class="mui-content-padded">
+					<button id="login" class="mui-btn mui-btn-green mui-btn-block">登录/注册</button>
+				</div>
+			</div>
+		</div>
+		
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/app.js"></script>
+		<script type="text/javascript">
+			mui.init();
+			
+			mui.plusReady(function() {
+			   if (plus.webview.currentWebview().opener().id == "me") {
+				   app.userLogout();
+			   }
+			});
+			
+			// 登录按钮的点击事件
+			mui(document.body).on("tap", ".mui-btn", function() {
+				if (checkParams()) {
+					ajaxLogin();
+				}
+			});
+			
+			// 检查表单参数是否合法
+			function checkParams() {
+				var phone = document.getElementById("phone");
+				var password = document.getElementById("password");
+				var reg = /^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/;
+				
+				if (phone.value == "") {
+					phone.focus();
+					return false;
+				} else if (!reg.test(phone.value)) {
+					app.showToast("手机号格式错误", "error");
+					return false;
+				}
+				if (password.value == "") {
+					password.focus();
+					return false;
+				} else if (password.value.length < 6) {
+					app.showToast("密码不能少于6个字符", "error");
+					return false;
+				}
+				return true;
+			}
+			
+			// 请求服务端登录
+			function ajaxLogin() {
+				mui("#login").button("loading"); // 将按钮状态置为Loading
+				document.activeElement.blur(); // 失去焦点，让软键盘收起
+				var cid = plus.push.getClientInfo().clientid; // 获取设备唯一标识
+				mui.ajax(app.serverUrl + "user/login", {
+					data: {
+						phone: phone.value,
+						password: password.value,
+						cid: cid
+					},
+					type: 'post',
+					timeout: 10000 ,// 超时时间为10秒
+					success: function(res) {
+						mui("#login").button("reset"); // 重置按钮
+						console.log(JSON.stringify(res)); // 在hbuilderx的控制台中可以打印出来
+						if (res.code !== 2000) {
+							return app.showToast(res.msg, "error");
+						}
+						app.setUserGlobalInfo(res.data); // 存储用户信息
+						mui.openWindow({ url: "index.html", id: "index" });
+					},
+					error: function(xhr, textStatus, errorThrown) {
+						mui("#login").button("reset");
+						if (textStatus == "timeout") {
+							app.showToast("连接超时", "error");
+						} else if (textStatus == "error") {
+							app.showToast("服务端错误", "error");
+						}
+					}
+				});
+			}
+		</script>
+	</body>
+
+</html>

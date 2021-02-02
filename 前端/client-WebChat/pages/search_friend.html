@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<link href="../font_icon/iconfont.css" rel="stylesheet" />
+		<link href="../css/common.css" rel="stylesheet" />
+		
+		<style type="text/css">
+			.mui-scroll-wrapper {
+				top: 89px;
+			}
+			.add-btn {
+				padding: 4px 8px;
+				line-height: 1;
+			}
+			.icon-_adduser {
+				font-size: 20px;
+			}
+			.mui-media-body {
+				margin-right: 40px;
+			}
+		</style>
+		
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<a id="search" class="mui-icon-right-nav mui-pull-right">搜索</a>
+			<h1 class="mui-title">搜索好友</h1>
+		</header>
+		
+		<div class="mui-content">
+			<div class="mui-input-row mui-search">
+				<span class="iconfont icon-sousuo1 search-icon"></span>
+				<input autofocus id="words" type="text" class="mui-input-clear mui-input-speech" 
+					placeholder="请输入手机号或者用户名">
+			</div>
+		</div>
+		
+		<div class="mui-scroll-wrapper">
+			<div class="mui-scroll">
+				<ul class="mui-table-view">
+					<li class="mui-table-view-cell mui-media">
+						<a href="javascript:;">
+							<img class="mui-media-object mui-pull-left" src="../imgs/face-cat.jpg">
+							<div class="mui-media-body">
+								标题
+								<p class="mui-ellipsis">能和心爱的人一起睡觉，是件幸福的事情；可是，打呼噜怎么办？</p>
+							</div>
+							<button type="button" class="mui-btn add-btn">
+								<span class="iconfont icon-_adduser"></span>
+							</button>
+						</a>
+					</li>
+					<li class="mui-table-view-cell mui-media">
+						<a href="javascript:;">
+							<img class="mui-media-object mui-pull-left" src="../imgs/face-cat.jpg">
+							<div class="mui-media-body">
+								木屋
+								<p class="mui-ellipsis">想要这样一间小木屋，夏天挫冰吃瓜，冬天围炉取暖.</p>
+							</div>
+						</a>
+					</li>
+					<li class="mui-table-view-cell mui-media">
+						<a href="javascript:;">
+							<img class="mui-media-object mui-pull-left" src="../imgs/face-cat.jpg">
+							<div class="mui-media-body">
+							    CBD
+								<p class="mui-ellipsis">烤炉模式的城，到黄昏，如同打翻的调色盘一般.</p>
+							</div>
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/app.js"></script>
+		<script type="text/javascript">
+			mui.init();
+			mui.plusReady(function () {
+				// 强制弹出软键盘
+				// app.popUpKeybord();
+				
+				var words = document.getElementById("words");
+				document.getElementById("search").addEventListener("tap", function() {
+					app.ajax("user/search", {
+						words: words.value
+					}, function(res) {
+						
+					}, "get");
+				});
+			});
+			
+		</script>
+	</body>
+
+</html>

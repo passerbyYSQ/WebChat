@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <link href="../css/mui.min.css" rel="stylesheet"/>
+	<link href="../font_icon/iconfont.css" rel="stylesheet" >
+	
+	<style type="text/css">
+		/* 右箭头的样式 */
+		.mui-icon-arrowright {
+			color: darkgray;
+			margin-right: -6px;
+			margin-left: 4px;
+		}
+		/* 中间内容字体 */
+		.mid-content {
+			display: inline-block;
+			max-width: 64%;
+			white-space:nowrap;
+			overflow:hidden;
+			text-overflow:ellipsis;
+			color: dimgray;
+		}
+		.mui-media-object {
+			width: 52px;
+			max-width: 52px !important;
+			height: 52px !important;
+			border-radius: 4px;
+		}
+	</style>
+	
+</head>
+<body>
+	<!-- <header class="mui-bar mui-bar-nav">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 class="mui-title">WebChat</h1>
+	</header> -->
+	
+	<!-- <div class="mui-content">
+		<ul class="mui-table-view">
+			<li class="mui-table-view-cell mui-media">
+				<a href="javascript:;">
+					<span class="mui-pull-left" style="line-height: 52px;">头像</span>
+					<span class="mui-icon mui-icon-arrowright mui-pull-right" style="line-height: 52px;"></span>
+					<img class="mui-media-object mui-pull-right" src="../imgs/face-cat.jpg">
+				</a>
+			</li>
+			<li class="mui-table-view-cell mui-media">
+				<a href="javascript:;" style="line-height: 24px;">
+					<span class="mui-pull-left">手机号</span>
+					<span class="mui-icon mui-icon-arrowright mui-pull-right"></span>
+					<span class="mui-pull-right mid-content">1857578434518575757843451857578434518575784345</span>
+				</a>
+			</li>
+			<li class="mui-table-view-cell mui-media">
+				<a href="javascript:;" style="line-height: 24px;">
+					<span class="mui-pull-left">用户名</span>
+					<span class="mui-icon mui-icon-arrowright mui-pull-right"></span>
+					<span class="mid-content mui-pull-right">王小明王小明王小明王小明王小明王小明</span>
+				</a>
+			</li>
+			<li class="mui-table-view-cell mui-media">
+				<a href="javascript:;">
+					<span class="mui-pull-left" style="line-height: 42px;">二维码</span>
+					<span class="mui-icon mui-icon-arrowright mui-pull-right" style="line-height: 42px;"></span>
+					<img class="mui-media-object mui-pull-right" src="../imgs/qrcode.png">
+				</a>
+			</li>
+		</ul>
+		<ul class="mui-table-view" style="margin-top: 8px;">
+			<li class="mui-table-view-cell mui-media">
+				<a href="javascript:;" style="text-align: center; line-height: 44px;">退出登录</a>
+			</li>
+		</ul>
+	</div> -->
+	<button id="btn">测试</button>
+	
+	<!-- 底部选项卡 -->
+	<nav class="mui-bar mui-bar-tab">
+		<a class="mui-tab-item mui-active" tabindex="0">
+			<span class="mui-icon iconfont icon-IMliaotian-duihua"></span>
+			<span class="mui-tab-label">聊天</span>
+		</a>
+		<a class="mui-tab-item" tabindex="1">
+			<span class="mui-icon iconfont icon-tongxunlu"></span>
+			<span class="mui-tab-label">通讯录</span>
+		</a>
+		<a class="mui-tab-item" tabindex="2">
+			<span class="mui-icon iconfont icon-faxian"></span>
+			<span class="mui-tab-label">发现</span>
+		</a>
+		<a class="mui-tab-item" tabindex="3">
+			<span class="mui-icon iconfont icon-wode"></span>
+			<span class="mui-tab-label">我</span>
+		</a>
+	</nav>
+	
+	
+	<script src="../js/mui.min.js"></script>
+	<script src="../js/app.js"></script>
+	
+	<script type="text/javascript" charset="utf-8">
+	  	mui.init();
+		
+		document.getElementById("btn").addEventListener("tap", function() {
+			app.showPrompt("标题", "内容");
+		});
+		
+		// 存储选项卡页面的数组
+		var subPages= [
+			{ id: "chat_list", 	url: "chat_list.html" 	},
+			{ id: "contact", 	url: "contact.html" 	},
+			{ id: "discover",	url: "discover.html" 	},
+			{ id: "me", 		url: "me.html" 			}
+		];
+		
+		var subWebViewStyle = {
+			top: "0",		// 注意双引号不能少
+			bottom: "50.4px"  // 防止遮挡底部的选项卡
+		};
+		
+		mui.plusReady(function () {
+			
+			var indexWebView = plus.webview.currentWebview();
+			
+			for(var i=0; i<subPages.length; i++) {
+				// 创建新的webview窗口用于加载新的html页面
+				var subWebView = plus.webview.create(subPages[i].url, subPages[i].id, subWebViewStyle);
+				// 先隐藏，再追加
+				subWebView.hide(); 
+				// 将子webview追加到当前的indexWebView中
+				indexWebView.append(subWebView);
+			}
+			// 设置默认显示的subWebView
+			plus.webview.show(subPages[0].id);
+			
+			// 批量绑定选项卡的tap事件
+			mui(".mui-bar-tab").on("tap", ".mui-tab-item", function() {
+				var tabIndex = this.getAttribute("tabindex");
+				plus.webview.show(subPages[tabIndex].id);
+				for(var i=0; i<subPages.length; i++) {
+					if (i != tabIndex) {
+						plus.webview.hide(subPages[i].id);
+					}
+				}
+			});
+			
+			// 关闭欢迎页或者登录页
+			plus.webview.currentWebview().opener().close();
+		});
+		
+		
+	</script>
+</body>
+</html>

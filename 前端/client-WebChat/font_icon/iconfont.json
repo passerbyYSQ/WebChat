@@ -1,0 +1,93 @@
+{
+  "id": "2356580",
+  "name": "WebChat",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "17935594",
+      "name": "82添加好友",
+      "font_class": "_adduser",
+      "unicode": "e625",
+      "unicode_decimal": 58917
+    },
+    {
+      "icon_id": "14347913",
+      "name": "搜索",
+      "font_class": "sousuo1",
+      "unicode": "e692",
+      "unicode_decimal": 59026
+    },
+    {
+      "icon_id": "7417074",
+      "name": "保存",
+      "font_class": "baocun",
+      "unicode": "e602",
+      "unicode_decimal": 58882
+    },
+    {
+      "icon_id": "5831339",
+      "name": "逆时针旋转",
+      "font_class": "nishizhenxuanzhuan",
+      "unicode": "e65a",
+      "unicode_decimal": 58970
+    },
+    {
+      "icon_id": "5831342",
+      "name": "顺时针旋转",
+      "font_class": "shunshizhenxuanzhuan",
+      "unicode": "e65c",
+      "unicode_decimal": 58972
+    },
+    {
+      "icon_id": "1121015",
+      "name": "更多",
+      "font_class": "gengduo",
+      "unicode": "e631",
+      "unicode_decimal": 58929
+    },
+    {
+      "icon_id": "9974395",
+      "name": "IM聊天-对话",
+      "font_class": "IMliaotian-duihua",
+      "unicode": "e6fe",
+      "unicode_decimal": 59134
+    },
+    {
+      "icon_id": "6435522",
+      "name": "聊天",
+      "font_class": "liaotian2",
+      "unicode": "e63f",
+      "unicode_decimal": 58943
+    },
+    {
+      "icon_id": "11082522",
+      "name": "首页",
+      "font_class": "dibutubiao_shouye",
+      "unicode": "e601",
+      "unicode_decimal": 58881
+    },
+    {
+      "icon_id": "343278",
+      "name": "我的",
+      "font_class": "wode",
+      "unicode": "e64a",
+      "unicode_decimal": 58954
+    },
+    {
+      "icon_id": "1048353",
+      "name": "通讯录",
+      "font_class": "tongxunlu",
+      "unicode": "e63a",
+      "unicode_decimal": 58938
+    },
+    {
+      "icon_id": "1330725",
+      "name": "发现",
+      "font_class": "faxian",
+      "unicode": "e746",
+      "unicode_decimal": 59206
+    }
+  ]
+}

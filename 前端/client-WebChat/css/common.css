@@ -1,0 +1,33 @@
+.mui-content>.mui-table-view:first-child {
+	margin-top: 1.2px;
+}
+header.mui-bar-nav {
+	line-height: 44px;
+}
+/* 调整搜索输入框 */
+.mui-search input {
+	margin-bottom: 0;
+	height: 44px;
+	padding: 0 38px;
+}
+.mui-search .search-icon {
+	height: 44px;
+	width: 38px;
+	position: absolute;
+	left: 0;
+	font-size: 19px;
+	text-align: center;
+	line-height: 44px;
+	color: gray;
+}
+.mui-search .mui-icon-speech, .mui-search .mui-icon-clear {
+	height: 44px !important;
+	top: 0 !important;
+	padding-top: 11px;
+}
+.mui-table-view-cell img.mui-media-object {
+	border-radius: 4px;
+}
+.mui-btn-block {
+	padding: 8px 0;
+}
