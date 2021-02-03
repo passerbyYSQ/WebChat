@@ -31,3 +31,6 @@ header.mui-bar-nav {
 .mui-btn-block {
 	padding: 8px 0;
 }
+.mui-content-padded {
+	margin: 12px;
+}

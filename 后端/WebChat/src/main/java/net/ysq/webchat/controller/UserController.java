@@ -128,6 +128,7 @@ public class UserController {
         Map<String, String> map = new HashMap<>();
         map.put("faceImage", user.getFaceImage());
         map.put("faceImageBig", user.getFaceImageBig());
+        map.put("qrcode", user.getQrcode());
         return ResultModel.success(map);
     }
 

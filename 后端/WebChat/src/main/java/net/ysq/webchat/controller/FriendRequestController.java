@@ -51,23 +51,42 @@ public class FriendRequestController {
     @PostMapping("process")
     public ResultModel updateRequestStatus(@NotBlank String requestId, @Range(min = 0, max = 3) byte status,
                                            HttpServletRequest request) {
-
+        // requestId合法性检查
         FriendRequest friendRequest = friendRequestService.getOneFriendRequest(requestId);
         if (ObjectUtils.isEmpty(friendRequest)) { // 好友申请不存在，可能因为requestId错误
             return ResultModel.failed(StatusCode.FRIEND_REQUEST_NOT_EXIST);
         }
 
+        // 已处理过的，禁止重复处理
+        if (friendRequest.getStatus() > 0) {
+            return ResultModel.failed(StatusCode.REPEAT_PROCESS);
+        }
+
         String myId = (String) request.getAttribute("userId");
-        if (!friendRequest.getAcceptUserId().equals(myId)) { // 没有权限修改其他人的好友申请
+        // 没有权限修改其他人的好友申请
+        if (!friendRequest.getAcceptUserId().equals(myId)) {
             return ResultModel.failed(StatusCode.NO_PERM);
         }
 
-        // 修改数据库记录
-        friendRequestService.updateRequestStatus(requestId, status);
+        // 如果已经是好友，就无法发送申请
+        // 情景：都发送了申请，一方同意之后，另一方又同意
+        // A发给B（申请为p1），B也发给了A（p2）。B先同意了（p1）。后来A又同意（p2）
+        // 这个时候我们需要给A提示说，你们已经是好友了。同时帮A将那条无法处理的申请的状态改为同意
+        MyFriend friend = friendService.getMyOneFriend(myId, friendRequest.getSendUserId());
+        if (!ObjectUtils.isEmpty(friend)) {
+            friendRequestService.updateRequestStatus(requestId, (byte) 1);
+            return ResultModel.failed(StatusCode.HAVE_BEEN_FRIEND);
+        }
+
+        // 修改数据库记录。如果是同意，还需要往好友列表插入一条数据
+        friendRequestService.agreeFriendRequest(requestId, status, myId, friendRequest.getSendUserId());
 
         // netty推送
         // ...
-        // 如果是忽略，则不推送；否则，推送
+        // 如果是忽略，则不推送；
+
+        // 否则，推送
+
 
         return ResultModel.success();
     }

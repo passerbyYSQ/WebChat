@@ -27,10 +27,10 @@
 		
 		<div class="mui-content">
 			<div class="content-box">
-				<textarea></textarea>
+				<textarea id="content" autofocus></textarea>
 			</div>
 			<div class="mui-content-padded">
-				<button class="mui-btn mui-btn-green mui-btn-block">
+				<button id="send" class="mui-btn mui-btn-green mui-btn-block">
 					<span class="iconfont icon-_adduser" style="font-size: 20px;"></span>
 					<span style="font-size: 18px;">发送好友申请</span>
 				</button>
@@ -47,6 +47,30 @@
 				var curView = plus.webview.currentWebview();
 				var receiverId = curView.receiverId;
 				console.log("这是add_friend页面，userId=" + receiverId);
+				// 弹起软键盘
+				app.popUpKeybord();
+				
+				var content = document.getElementById("content");
+				
+				document.getElementById("send").addEventListener("tap", function() {
+					mui("#send").button("loading"); // 按钮loading
+					document.activeElement.blur(); // 收起软键盘
+					app.ajax("friendRequest/send", {
+						receiverId: receiverId,
+						content: content.value
+					}, function(res) {
+						mui("#send").button("reset");
+						app.showToast("已成功发送好友申请", "success");
+						mui.openWindow({
+							url: "index.html",
+							id: "index"
+						});
+					}, "post", function() {
+						mui("#send").button("reset");
+					});
+					
+				});
+				
 			});
 			
 		</script>

@@ -4,22 +4,22 @@ window.addEventListener('refresh', function(e) {
 
 window.app = {
 	
-	initMyMui: function() {
-		var _this = this;
-		return mui.init({
-			beforeback: function() {
-		　　　　 //获得父页面的webview
-				var parent = plus.webview.currentWebview().opener();
-		　　　　 //触发父页面的自定义事件(refresh),从而进行刷新
-				if (_this.isNotNull(parent)) {
-					mui.fire(parent, 'refresh');
-					console.log(parent.id);
-				}
-				//返回true,继续页面关闭逻辑
-				return true;
-			}
-		});
-	},
+	// initMyMui: function() {
+	// 	var _this = this;
+	// 	return mui.init({
+	// 		beforeback: function() {
+	// 	　　　　 //获得父页面的webview
+	// 			var parent = plus.webview.currentWebview().opener();
+	// 	　　　　 //触发父页面的自定义事件(refresh),从而进行刷新
+	// 			if (_this.isNotNull(parent)) {
+	// 				mui.fire(parent, 'refresh');
+	// 				console.log(parent.id);
+	// 			}
+	// 			//返回true,继续页面关闭逻辑
+	// 			return true;
+	// 		}
+	// 	});
+	// },
 	
 	/**
 	 * netty服务后端发布的url地址
@@ -58,11 +58,77 @@ window.app = {
 		return obj != null && obj != undefined;
 	},
 	
+	formatDate: function(dateStr) {
+		//字符串转换为时间戳。js中可以嵌套定义函数
+		function getDateTimeStamp (dateStr) {
+		    return Date.parse(dateStr.replace(/-/gi,"/"));
+		}
+		
+	    var publishTime = getDateTimeStamp(dateStr)/1000,
+	        d_seconds,
+	        d_minutes,
+	        d_hours,
+	        d_days,
+	        timeNow = parseInt(new Date().getTime()/1000),
+	        d,
+	
+	        date = new Date(publishTime*1000),
+	        Y = date.getFullYear(),
+	        M = date.getMonth() + 1,
+	        D = date.getDate(),
+	        H = date.getHours(),
+	        m = date.getMinutes(),
+	        s = date.getSeconds();
+	        //小于10的在前面补0
+	        if (M < 10) {
+	            M = '0' + M;
+	        }
+	        if (D < 10) {
+	            D = '0' + D;
+	        }
+	        if (H < 10) {
+	            H = '0' + H;
+	        }
+	        if (m < 10) {
+	            m = '0' + m;
+	        }
+	        if (s < 10) {
+	            s = '0' + s;
+	        }
+	
+	    d = timeNow - publishTime;
+	    d_days = parseInt(d/86400);
+	    d_hours = parseInt(d/3600);
+	    d_minutes = parseInt(d/60);
+	    d_seconds = parseInt(d);
+	
+	    if(d_days > 0 && d_days < 3){
+	        return d_days + '天前';
+	    }else if(d_days <= 0 && d_hours > 0){
+	        return d_hours + '小时前';
+	    }else if(d_hours <= 0 && d_minutes > 0){
+	        return d_minutes + '分钟前';
+	    }else if (d_seconds < 60) {
+	        if (d_seconds <= 0) {
+	            return '刚刚';
+	        }else {
+	            return d_seconds + '秒前';
+	        }
+	    }else if (d_days >= 3 && d_days < 30){
+	        return M + '-' + D + ' ' + H + ':' + m;
+	    }else if (d_days >= 30) {
+	        return Y + '-' + M + '-' + D + ' ' + H + ':' + m;
+	    }
+	},
+	
 	/**
 	 * 封装ajax请求,携带token。
 	 * 必须要在plusReady()事件之后调用
 	 */
-	ajax: function(url, data, successCallback, type = "post", errorCallback = function() {}) {
+	ajax: function(url, data, successCallback, type = "post", 
+		errorCallback = function() {}, 
+		failedCallback = function(res) { app.showToast(res.msg, "error"); }) {
+			
 		plus.nativeUI.showWaiting("Loading...");
 		var user = this.getUserGlobalInfo();
 		var token = null;
@@ -75,7 +141,7 @@ window.app = {
 			type: type,
 			data: data,
 			// dataType: "json",
-			timeout: 10000 ,// 超时时间为10秒
+			timeout: 30000 ,// 超时时间为30秒
 			headers: {
 				token: token // 携带token
 			},
@@ -84,9 +150,10 @@ window.app = {
 				console.log(JSON.stringify(res));
 				plus.nativeUI.closeWaiting();
 				if (res.code !== 2000) { // 与后端约定：成功的业务状态的请求统一返回2000
-					return _this.showToast(res.msg, "error");
+					failedCallback(res); // 业务失败
+				} else {
+					successCallback(res); // 业务成功
 				}
-				successCallback(res);
 			},
 			error: function(xhr, textStatus, errorThrown) {
 				console.log("error");
@@ -96,7 +163,9 @@ window.app = {
 				} else if (textStatus == "error") {
 					app.showToast("服务端错误", "error");
 				}
-				errorCallback(xhr, textStatus, errorThrown);
+				if (errorCallback != null) {
+					errorCallback(xhr, textStatus, errorThrown);
+				}
 			}
 		});
 	},

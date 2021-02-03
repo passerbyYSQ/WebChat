@@ -19,6 +19,7 @@
             r.id,
             r.content,
             r.status,
+            r.request_date_time requestTime,
             u.username senderUsername,
             u.face_image senderFaceImg
         from friend_request r, user u

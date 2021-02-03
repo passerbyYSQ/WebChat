@@ -94,6 +94,7 @@
 								var user = app.getUserGlobalInfo();
 								user.faceImage = res.data.faceImage;
 								user.faceImageBig = res.data.faceImageBig;
+								user.qrcode = res.data.qrcode;
 								app.setUserGlobalInfo(user);
 								// 刷新页面，有问题
 								// var faceImgView = plus.webview.getWebviewById("face_img");

@@ -39,9 +39,9 @@ public enum StatusCode {
     // 好友相关的
     FRIEND_REQUEST_FREQUENT(6300, "距离上一次好友申请不足半个小时，请勿频繁申请"),
     CAN_NOT_ADD_SELF(6301, "不能添加自己为好友"),
-    HAVE_BEEN_FRIEND(6302, "已经是好友，无法发送好友申请"),
-    FRIEND_REQUEST_NOT_EXIST(6303, "好友申请不存在") // 传参错误
-
+    HAVE_BEEN_FRIEND(6302, "你们已经是好友，请勿重复处理"),
+    FRIEND_REQUEST_NOT_EXIST(6303, "好友申请不存在"), // 传参错误
+    REPEAT_PROCESS(6304, "请勿重复处理")
     ;
 
 

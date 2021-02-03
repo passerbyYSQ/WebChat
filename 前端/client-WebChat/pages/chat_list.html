@@ -6,6 +6,21 @@
 		<title></title>
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 		<link href="../css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="../css/common.css">
+		
+		<style type="text/css">
+			.mui-media-body {
+				padding-right: 28px;
+			}
+			.btn-group {
+				margin-top: 8px !important;
+				display: flex;
+				justify-content: space-around;
+			}
+			.btn-group button {
+				padding: 4px 20px;
+			}
+		</style>
 	</head>
 	
 		<header class="mui-bar mui-bar-nav">
@@ -13,13 +28,105 @@
 		</header>
 		
 		<div class="mui-content">
-			聊天列表
+			<ul id="list" class="mui-table-view"> 
+				<li class="mui-table-view-cell mui-collapse">
+					<a class="mui-navigate-right" href="#">
+						<img class="mui-media-object mui-pull-left" src="../imgs/face-cat.jpg">
+						<div class="mui-media-body">
+							<span>王小明王</span>
+							<span class='mui-badge mui-badge-warning' style="padding: 2px 6px;">new</span>
+							<p class="mui-pull-right">3秒前</p>
+							<p class="mui-ellipsis"><b>[ 状态 ]</b> 向你发来了一个好友请求</p>
+						</div>
+					</a>
+					<div class="mui-collapse-content">
+						<p>你好啊，能认识一下你吗？？？？？你好啊，能认识一下你吗？？？？？你好啊，
+						能认识一下你吗？？？？？你好啊，能认识一下你吗？？？？？
+						</p>
+						<div class="btn-group">
+							<button type="button" class="mui-btn mui-btn-danger">拒绝</button>
+							<button type="button" class="mui-btn mui-btn-grey">忽略</button>
+							<button type="button" class="mui-btn mui-btn-green">同意</button>
+						</div>
+					</div>
+				</li>
+			</ul>
 		</div>
 
 	<body>
 		<script src="../js/mui.min.js"></script>
+		<script src="../js/app.js"></script>
 		<script type="text/javascript">
 			mui.init();
+			
+			mui.plusReady(function () {
+				loadList();
+				
+				// 注意不要在这里绑定按钮的点击事件，因为loadList()是异步的
+			});
+			
+			// 请求后端
+			function loadList() {
+				app.ajax("friendRequest/list", {
+					page: 1,
+					count: 10
+				}, function(res) {
+					var list = res.data.list;
+					joinHtml(list);
+					
+					// 加载数据之后，才绑定
+					mui(".btn-group").on("tap", ".mui-btn", function() {
+						var requestId = this.getAttribute("rid");
+						var status = this.getAttribute("status");
+						// app.showToast(requestId + ',' + status, "success");
+						updateStatus(requestId, status);
+					});
+				}, "get");
+			}
+			
+			function updateStatus(requestId, status) {
+				app.ajax("friendRequest/process", {
+					requestId: requestId,
+					status: status
+				}, function(res) {
+					loadList(); // 重新加载列表
+				}, "post", null, function(res) {
+					app.showToast(res.msg, "error");
+					loadList(); // 重新加载列表
+				});
+			}
+			
+			// 根据返回数据，拼接html
+			function joinHtml(list) {
+				var status = ['未处理', "已同意", "已忽略", "已拒绝"];
+				var html = "";
+				for(var i=0; i<list.length; i++) {
+					var btnsHtml = "";
+					var remind ="";
+					if (list[i].status == 0) { // 尚未处理。需要显示操作按钮
+						remind = " <span class='mui-badge mui-badge-warning' style='padding: 2px 6px;'>new</span>";
+						btnsHtml = "<div class='btn-group'>" +
+										"<button type='button' rid='"+ list[i].id +"' status='3' class='mui-btn mui-btn-danger'>拒绝</button>" +
+										"<button type='button' rid='"+ list[i].id +"' status='2' class='mui-btn mui-btn-grey'>忽略</button>" +
+										"<button type='button' rid='"+ list[i].id +"' status='1' class='mui-btn mui-btn-green'>同意</button></div>";					
+					}
+					html += ("<li class='mui-table-view-cell mui-collapse'>" +
+								"<a class='mui-navigate-right' href='#'>" +
+									"<img class='mui-media-object mui-pull-left' src='" + list[i].senderFaceImg + "'>" +
+									"<div class='mui-media-body'>" +
+										"<span>" + list[i].senderUsername + "</span>" + remind +
+										"<p class='mui-pull-right'>" + app.formatDate(list[i].requestTime) + "</p>" +
+										"<p class='mui-ellipsis'><b>[ " + status[list[i].status] + " ]</b> 向你发来了一个好友请求</p></div></a>" + 
+										 "<div class='mui-collapse-content'>" +
+											"<p>" + list[i].content + "</p>" +
+											btnsHtml + "</div></li>");
+							
+				}
+				
+				var list = document.getElementById("list");
+				list.innerHTML = html;
+			}
+			
 		</script>
 	</body>
 

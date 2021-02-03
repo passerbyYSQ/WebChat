@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService {
         User user = OssUtils.uploadFaceImg(base64DataBean.getBytes(), userId, base64DataBean.getSuffix());
 
         // 更新oss中的二维码
-        String qrCodeUrl = generateAndUploadQRCode("content", user.getFaceImageBig(), userId);
+        String qrCodeUrl = generateAndUploadQRCode(userId, user.getFaceImageBig(), userId);
         user.setQrcode(qrCodeUrl);
 
         // 根据userId更新数据库记录
@@ -115,7 +115,7 @@ public class UserServiceImpl implements UserService {
         String userId = sid.nextShort();
 
         // 二维码
-        String qrCodeUrl = generateAndUploadQRCode("content", null, userId);
+        String qrCodeUrl = generateAndUploadQRCode(userId, null, userId);
 
         User user = new User();
         user.setId(userId);

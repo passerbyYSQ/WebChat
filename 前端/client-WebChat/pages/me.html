@@ -90,7 +90,7 @@
 			    var curWebview = plus.webview.currentWebview();
 				var user = app.getUserGlobalInfo();
 				curWebview.addEventListener("show", function() {
-					refreshUserInfo(user);
+					refreshUserInfo();
 				});
 				
 				// 点击头像的<li>
@@ -141,13 +141,13 @@
 			}
 			
 			// 刷新用户信息
-			function refreshUserInfo(user) {
+			function refreshUserInfo() {
 				
 				console.log("个人信息页面");
-				
+				var user = app.getUserGlobalInfo();
 				document.getElementById("phone").innerHTML = user.phone;
 				document.getElementById("username").innerHTML = user.username;
-				
+				console.log(user.qrcode);
 				if (app.isNotBlank(user.faceImage)) {
 					document.getElementById("faceImage").src = user.faceImage; // 阿里oss
 				}

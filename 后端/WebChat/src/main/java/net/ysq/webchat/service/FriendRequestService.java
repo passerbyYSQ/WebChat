@@ -12,7 +12,14 @@ import java.util.List;
 public interface FriendRequestService {
 
     /**
-     * 好友申请的状态
+     * 同意申请：
+     * 1、更新申请的状态
+     * 2、如果是同意，还要往好友表里面插入2条记录
+     */
+    void agreeFriendRequest(String requestId, byte status, String myId, String friendId);
+
+    /**
+     * 更新申请的状态
      */
     void updateRequestStatus(String requestId, byte status);
 

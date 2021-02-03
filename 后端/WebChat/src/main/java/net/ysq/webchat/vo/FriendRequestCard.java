@@ -1,5 +1,7 @@
 package net.ysq.webchat.vo;
 
+import java.time.LocalDateTime;
+
 /**
  * 用于显示我收到的好友申请的列表
  *
@@ -13,6 +15,7 @@ public class FriendRequestCard {
     private String senderFaceImg;  // 发送者的头像
     private String content; // 备注内容
     private byte status; // 状态
+    private LocalDateTime requestTime;
 
     public String getId() {
         return id;
@@ -52,5 +55,13 @@ public class FriendRequestCard {
 
     public void setStatus(byte status) {
         this.status = status;
+    }
+
+    public LocalDateTime getRequestTime() {
+        return requestTime;
+    }
+
+    public void setRequestTime(LocalDateTime requestTime) {
+        this.requestTime = requestTime;
     }
 }

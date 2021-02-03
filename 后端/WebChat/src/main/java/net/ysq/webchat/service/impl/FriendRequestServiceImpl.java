@@ -3,12 +3,13 @@ package net.ysq.webchat.service.impl;
 import net.ysq.webchat.dao.FriendRequestMapper;
 import net.ysq.webchat.dao.MyFriendMapper;
 import net.ysq.webchat.po.FriendRequest;
-import net.ysq.webchat.po.MyFriend;
 import net.ysq.webchat.service.FriendRequestService;
+import net.ysq.webchat.service.FriendService;
 import net.ysq.webchat.vo.FriendRequestCard;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,20 +21,41 @@ import java.util.List;
 @Service // 不要忘了
 public class FriendRequestServiceImpl implements FriendRequestService {
 
-
+    @Autowired
+    private FriendService friendService;
 
     @Autowired
     private FriendRequestMapper friendRequestMapper;
 
     @Autowired
+    private MyFriendMapper myFriendMapper;
+
+    @Autowired
     private Sid sid;
+
+
+    /**
+     * agreeFriendRequest()上加了@Transactional，
+     * addFriend()也加了@Transactional。
+     * 会不会addFriend的事务跟agreeFriendRequest的事务会不会不是同一个？
+     */
+    @Transactional // 注意这里加上事务注解
+    @Override
+    public void agreeFriendRequest(String requestId, byte status, String myId, String friendId) {
+        updateRequestStatus(requestId, status);
+        if (status == 1) { // 同意
+            // 注意addFriend这里面不需要重复加@Transactional了。因为默认的事务传播级别为REQUIRED（必须的）
+            // 子方法如果是必须运行在一个事务中的，如果当前存在事务，则加入这个事务，成为一个整体。如果当前没有事务，则自己新建一个事务，
+            friendService.addFriend(myId, friendId);
+        }
+    }
 
     @Override
     public void updateRequestStatus(String requestId, byte status) {
         FriendRequest request = new FriendRequest();
         request.setId(requestId);
         request.setStatus(status);
-        // 注意使用selective
+        // 更新好友申请的状态。注意使用selective
         friendRequestMapper.updateByPrimaryKeySelective(request);
     }
 
