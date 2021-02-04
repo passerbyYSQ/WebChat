@@ -25,9 +25,11 @@ header.mui-bar-nav {
 	top: 0 !important;
 	padding-top: 11px;
 }
+/* 图片的圆角 */
 .mui-table-view-cell img.mui-media-object {
 	border-radius: 4px;
 }
+/* 按钮 */
 .mui-btn-block {
 	padding: 8px 0;
 }

@@ -6,6 +6,25 @@
 		<title></title>
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 		<link href="../css/mui.min.css" rel="stylesheet" />
+		<link href="../css/mui.indexedlist.css" rel="stylesheet" />
+		<style>
+			html, body {
+				height: 100%;
+				overflow: hidden;
+			}
+			.mui-bar {
+				-webkit-box-shadow: none;
+				box-shadow: none;
+			}
+			/* 图片的圆角 */
+			.mui-table-view-cell img.mui-media-object {
+				border-radius: 4px;
+			}
+			.mui-media-body {
+				line-height: 42px;
+			}
+		</style>
+		
 	</head>
 	
 		<header class="mui-bar mui-bar-nav">
@@ -13,13 +32,170 @@
 		</header>
 		
 		<div class="mui-content">
-			通讯录页面
+			<!-- 这里已经定义了id为list，别冲突了 -->
+			<div id='list' class="mui-indexed-list">
+				<div class="mui-indexed-list-search mui-input-row mui-search">
+					<input type="search" class="mui-input-clear mui-indexed-list-search-input" placeholder="搜索机场">
+				</div>
+				<div class="mui-indexed-list-bar">
+					<a>A</a>
+					<a>B</a>
+					<a>C</a>
+					<a>D</a>
+					<a>E</a>
+					<a>F</a>
+					<a>G</a>
+					<a>H</a>
+					<a>I</a>
+					<a>J</a>
+					<a>K</a>
+					<a>L</a>
+					<a>M</a>
+					<a>N</a>
+					<a>O</a>
+					<a>P</a>
+					<a>Q</a>
+					<a>R</a>
+					<a>S</a>
+					<a>T</a>
+					<a>U</a>
+					<a>V</a>
+					<a>W</a>
+					<a>X</a>
+					<a>Y</a>
+					<a>Z</a>
+					<a>#</a>
+				</div>
+				<div class="mui-indexed-list-alert"></div>
+				<div class="mui-indexed-list-inner">
+					<div class="mui-indexed-list-empty-alert">没有数据</div>
+					<ul id="contactList" class="mui-table-view">
+					</ul>
+				</div>
+			</div>
 		</div>
 
 	<body>
 		<script src="../js/mui.min.js"></script>
+		<script src="../js/mui.indexedlist.js"></script>
+		<script src="../js/pinyin.js"></script>
+		<script src="../js/app.js"></script>
+		
 		<script type="text/javascript">
 			mui.init();
+			mui.ready(function() {
+				// 初始化indexedList空间
+				initIndexdList();
+			});
+			mui.plusReady(function () { // 注意plusReady在页面声明周期只有一次，而show有多次
+				var contactList = app.getContactList();
+				// 关于新增和删除好友，还要面临缓存更新问题。这个留到netty之后再解决
+				if (!app.isNotNull()) { // 本地没有缓存数据
+					// 由于ajax里面用到了plus取缓存，所以需要放在plusReady里面
+					fetchContactList(); // 请求后台拿取数据并且缓存到本地
+				}
+				
+				// 上面的操作已经确保本地一定会有数据，那么对webview的show事件添加监听
+				var curView = plus.webview.currentWebview();
+				curView.addEventListener("show", function() {
+					// 从缓存中拿取数据，并渲染到页面中
+					showContactList();
+				});
+			});
+			
+			var letters = [
+				'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 
+				'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+				'U', 'V', 'W', 'X', 'Y', 'Z', '#'
+			];
+			
+			// 获取首字母在letters中的下标
+			function getLetterIndex(ch) {
+				for(var i=0; i<letters.length; i++) {
+					if (ch == letters[i]) {
+						return i;
+					}
+				}
+				return letters.length - 1; // 归属于'#'
+			}
+			
+			function showContactList() {
+				// listModel[0]=arr：表示首字母是A的好友全部在arr中
+				// 第一维的下标与letters中的字母映射
+				var listModel = []; // 是一个二维数组。
+				for(var i=0; i<letters.length; i++) {
+					listModel[i] = [];
+				}
+				
+				// 此处，必定能拿到数据
+				var friends = app.getContactList();
+				for(var i=0; i<friends.length; i++) {
+					// 将好友的用户名（备注名的功能之后再结合后端进行扩展）转成拼音
+					var namePinyin = words.convertPinyin(friends[i].username);
+					// 新增属性
+					friends[i].pinyin = namePinyin;
+					// 取出第一个字母，并转成大写
+					var firstLetter = namePinyin.substr(0, 1).toUpperCase(); 
+					// console.log("首字母：" + firstLetter);
+					var index = getLetterIndex(firstLetter);
+					// 添加到二维数组中的对应位置
+					listModel[index].push(friends[i]);
+				}
+				
+				// 构造二维模型之后，可以渲染页面了
+				var listHtml = "";
+				for(var i=0; i<listModel.length; i++) {
+					var group = listModel[i];
+					if (group.length == 0) {
+						continue;
+					}
+					// console.log(letters[i]);
+					// console.log(JSON.stringify(group));
+					// 组别
+					listHtml += ("<li data-group='" + letters[i] + "' class='mui-table-view-divider mui-indexed-list-group'>" + letters[i] + "</li>");
+					for(var j=0; j<group.length; j++) { // 当前组别下的好友
+						// data-value='AKU' data-tags='AKeSu'
+						// 通过自定义属性进行数据传递
+						var friendJson = JSON.stringify(group[j]);
+						listHtml += ("<li friendJson='" + friendJson +"' data-tags='" + group[j].pinyin + "' class='mui-media mui-table-view-cell mui-indexed-list-item'>" +
+							"<img class='mui-media-object mui-pull-left' src='" + group[j].faceImg + "'>" +
+							"<div class='mui-media-body'>" + group[j].username + "</div></li>");
+					}
+				} 
+				document.getElementById("contactList").innerHTML = listHtml;
+				
+				// 给每一个联系人的li添加点击监听
+				mui("#contactList").on("tap", ".mui-indexed-list-item", function() {
+					var friendJson = this.getAttribute("friendJson");
+					var friendObj = JSON.parse(friendJson);
+					mui.openWindow({
+						url: "chatting.html",
+						id: "chatting_with_" + friendObj.userId,
+						extras: {
+							friendJson: friendJson
+						}
+					});
+				});
+			}
+			
+			// 初始化indexedList。不包含数据，只是初始化样式。所以放在ready()的回调中
+			function initIndexdList() {
+				var header = document.querySelector('header.mui-bar');
+				var list = document.getElementById('list');
+				//calc hieght
+				list.style.height = (document.body.offsetHeight - header.offsetHeight) + 'px';
+				//create
+				window.indexedList = new mui.IndexedList(list);
+			}
+			
+			// 请求服务端获取好友列表数据
+			function fetchContactList() {
+				console.log("请求后端拿取好友列表--");
+				app.ajax("friend/list", {}, function(res) {
+					app.setContactList(res.data);
+				}, "get");
+			}
+			
 		</script>
 	</body>
 

@@ -11,4 +11,16 @@
     <result column="remarks_name" jdbcType="VARCHAR" property="remarksName" />
     <result column="added_date_time" jdbcType="TIMESTAMP" property="addedDateTime" />
   </resultMap>
+
+  <select id="getFriendList" parameterType="String" resultType="net.ysq.webchat.vo.FriendCard">
+    select
+        u.id userId,
+        u.username username,
+        u.face_image faceImg,
+        f.remarks_name remarksName
+    from my_friend f
+    left join user u on f.my_friend_user_id=u.id
+    where f.my_user_id=#{myId}
+  </select>
+
 </mapper>

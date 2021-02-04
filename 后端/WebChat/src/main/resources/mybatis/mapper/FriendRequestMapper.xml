@@ -22,9 +22,9 @@
             r.request_date_time requestTime,
             u.username senderUsername,
             u.face_image senderFaceImg
-        from friend_request r, user u
-        where r.accept_user_id=#{receiverId} and
-              r.send_user_id=u.id
+        from friend_request r
+        left join user u on r.send_user_id=u.id
+        where r.accept_user_id=#{receiverId}
         order by request_date_time desc
   </select>
 

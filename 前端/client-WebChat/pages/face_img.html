@@ -63,9 +63,13 @@
 			//app.initMyMui();
 			
 			mui.plusReady(function() {
-				var photo = document.getElementById("photo");
-				var user = app.getUserGlobalInfo();
-				photo.src = user.faceImageBig;
+				
+				var curView = plus.webview.currentWebview();
+				curView.addEventListener("show", function() {
+					var photo = document.getElementById("photo");
+					var user = app.getUserGlobalInfo();
+					photo.src = user.faceImageBig;
+				});
 				
 				// 打开菜单的点击事件
 				document.getElementById("openMenu").addEventListener("tap", function() {

@@ -1,0 +1,171 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<link href="../css/chatting.css" rel="stylesheet" />
+		<style type="text/css">
+			#msgList {
+				height: 100%;
+				overflow: auto;
+				/* 可滚动 */
+				-webkit-overflow-scrolling: touch; 
+			}
+			.mui-content {
+				padding-bottom: 50px;
+			}
+		</style>
+	</head>
+	<body contextmenu="return false;">
+		
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title" id="title">王小明</h1>
+		</header>
+		<div class="mui-content" id="msgList">
+			
+					<div class="friend-msg">
+						<img src="../imgs/face-cat.jpg" >
+						<div class="content-box">
+							<p>当软键盘弹出后，我们的聊天窗口会从原来的全屏调整为半屏，对当前的窗i件</p>
+						</div>
+					</div>
+					<div class="me-msg">
+						<div class="content-box">
+							<p>当软键盘弹出后，我们的聊天窗口会从原来的全屏调整为半屏，对当前的窗i件</p>
+						</div>
+						<img src="../imgs/bird.png" >
+					</div>
+					<div class="friend-msg">
+						<img src="../imgs/face-cat.jpg" >
+						<div class="content-box">
+							<p>当软键盘弹出后，我们的聊天窗口会从原来的全屏调整为半屏，对当前的窗i件</p>
+						</div>
+					</div>
+					<div class="me-msg">
+						<div class="content-box">
+							<p>当软键盘弹出后，我们的聊天窗口会从原来的全屏调整为半屏，对当前的窗i件</p>
+						</div>
+						<img src="../imgs/bird.png" >
+					</div>
+					<div class="friend-msg">
+						<img src="../imgs/face-cat.jpg" >
+						<div class="content-box">
+							<p>当软键盘弹出后，我们的聊天窗口会从原来的全屏调整为半屏，对当前的窗i件</p>
+						</div>
+					</div>
+					<div class="me-msg">
+						<div class="content-box">
+							<p>当软键盘弹出后，我们的聊天窗口会从原来的全屏调整为半屏，对当前的窗i件</p>
+						</div>
+						<img src="../imgs/bird.png" >
+					</div>
+					<div class="friend-msg">
+						<img src="../imgs/face-cat.jpg" >
+						<div class="content-box">
+							<p>当软键盘弹出后，我们的聊天窗口会从原来的全屏调整为半屏，对当前的窗i件</p>
+						</div>
+					</div>
+					<div class="me-msg">
+						<div class="content-box">
+							<p>当软键盘弹出后，我们的聊天窗口会从原来的全屏调整为半屏，对当前的窗i件</p>
+						</div>
+						<img src="../imgs/bird.png" >
+					</div>
+					<div class="friend-msg">
+						<img src="../imgs/face-cat.jpg" >
+						<div class="content-box">
+							<p>当软键盘弹出后，我们的聊天窗口会从原来的全屏调整为半屏，对当前的窗i件</p>
+						</div>
+					</div>
+					<div class="me-msg">
+						<div class="content-box">
+							<p>当软键盘弹出后，我们的聊天窗口会从原来的全屏调整为半屏，对当前的窗i件</p>
+						</div>
+						<img src="../imgs/bird.png" >
+					</div>
+					<div class="friend-msg">
+						<img src="../imgs/face-cat.jpg" >
+						<div class="content-box">
+							<p>当软键盘弹出后，我们的聊天窗口会从原来的全屏调整为半屏，对当前的窗i件</p>
+						</div>
+					</div>
+					<div class="me-msg">
+						<div class="content-box">
+							<p>当软键盘弹出后，我们的聊天窗口会从原来的全屏调整为半屏，对当前的窗i件</p>
+						</div>
+						<img src="../imgs/bird.png" >
+					</div>
+		</div>
+			
+		
+		<div class="footer">
+			<textarea id="content"></textarea>
+			<button id="send" disabled type="button" class="mui-btn mui-btn-gray">发送</button>
+		</div>
+		
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/app.js"></script>
+		<script type="text/javascript">
+			(function($, doc) { // 在{}中$相当于mui，doc相当于document
+				mui.init();
+				
+				var friend;
+				
+				mui.plusReady(function () {
+					// 我的信息
+					var me = app.getUserGlobalInfo();
+					var curView = plus.webview.currentWebview();
+					// 设置软键盘样式
+					curView.setStyle({
+						//自动调整Webview窗口大小（屏幕区域减去软键盘区域），同时自动滚动Webview保证输入框可见
+						softinputMode: "adjustResize"
+					});
+					
+					// 好友信息
+					friend = JSON.parse(curView.friendJson);
+					// 标题栏
+					document.getElementById("title").innerHTML = friend.username; // 备注名功能之后再完善
+					
+					// 聊天列表滚动到底部
+					scrollToBottom();
+					window.addEventListener("resize", function() {
+						scrollToBottom();
+					});
+					
+					// 监听输入
+					listenInput();			
+				});
+				
+				
+				function scrollToBottom() {
+					var msgList = document.getElementById("msgList");
+					msgList.scrollTop = msgList.scrollHeight - msgList.offsetHeight;
+				}
+				
+				function listenInput() {
+					var content = document.getElementById("content");
+					var send = document.getElementById("send");
+					content.addEventListener("input", function() { // 监听手呼入
+						console.log(content.value);
+						if(content.value.trim().length > 0) {
+							send.setAttribute("class", "mui-btn mui-btn-green");
+							send.removeAttribute("disabled");
+						} else {
+							send.setAttribute("class", "mui-btn mui-btn-gray");
+							send.setAttribute("disabled", "disabled");
+						}
+					});
+				}
+				
+				
+			}(mui, document));
+			
+			
+		</script>
+	</body>
+
+</html>

@@ -125,7 +125,9 @@ public class UserController {
 
         User user = userService.uploadAndUpdateFaceImg(base64, userId);
 
-        Map<String, String> map = new HashMap<>();
+        //long timestamp = Instant.now().toEpochMilli(); // 获取当前时间戳，拼接到图片url后面
+        // 防止因为前端网页因为缓存不请求同一路径的图片
+        Map<String, String> map = new HashMap<>(); //  + "&rand=" + timestamp
         map.put("faceImage", user.getFaceImage());
         map.put("faceImageBig", user.getFaceImageBig());
         map.put("qrcode", user.getQrcode());

@@ -135,7 +135,7 @@ window.app = {
 		if (this.isNotNull(user)) {
 			token = user.token;
 		}
-		console.log(token);
+		// console.log(token);
 		var _this = this;
 		mui.ajax(this.serverUrl + url, {
 			type: type,
@@ -239,7 +239,9 @@ window.app = {
 		}
 	},
 	
-	//保存用户的联系人列表
+	/**
+	 * 缓存用户的联系人列表
+	 */
 	setContactList:function(myFriendList){
 		var contactListStr = JSON.stringify(myFriendList);
 		plus.storage.setItem("contactList",contactListStr);
@@ -249,13 +251,12 @@ window.app = {
 	 */
 	getContactList: function() {
 		var contactListStr = plus.storage.getItem("contactList");
-		
 		if (!this.isNotNull(contactListStr)) {
-			return [];
+			return null;
 		}
-		
 		return JSON.parse(contactListStr);
 	},
+	
 	getFriendFromContactList:function(friendId){
 		//获取联系人列表的本地缓存
 		var contactListStr = plus.storage.getItem("contactList");

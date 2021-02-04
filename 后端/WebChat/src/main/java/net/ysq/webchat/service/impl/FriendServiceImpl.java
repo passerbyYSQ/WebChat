@@ -3,12 +3,14 @@ package net.ysq.webchat.service.impl;
 import net.ysq.webchat.dao.MyFriendMapper;
 import net.ysq.webchat.po.MyFriend;
 import net.ysq.webchat.service.FriendService;
+import net.ysq.webchat.vo.FriendCard;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @author passerbyYSQ
@@ -22,6 +24,11 @@ public class FriendServiceImpl implements FriendService {
 
     @Autowired
     private Sid sid;
+
+    @Override
+    public List<FriendCard> getFriendList(String myId) {
+        return myFriendMapper.getFriendList(myId);
+    }
 
     @Transactional
     @Override

@@ -6,6 +6,7 @@ import net.ysq.webchat.po.MyFriend;
 import net.ysq.webchat.po.User;
 import net.ysq.webchat.service.FriendService;
 import net.ysq.webchat.service.UserService;
+import net.ysq.webchat.vo.FriendCard;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.ObjectUtils;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 /**
  * @author passerbyYSQ
@@ -32,6 +34,16 @@ public class FriendController {
 
     @Autowired
     private FriendService friendService;
+
+    /**
+     * 获取我的好友列表（Contact）
+     */
+    @GetMapping("list")
+    public ResultModel<List<FriendCard>> friendList(HttpServletRequest request) {
+        String myId = (String) request.getAttribute("userId");
+        List<FriendCard> friendList = friendService.getFriendList(myId);
+        return ResultModel.success(friendList);
+    }
 
     @GetMapping("isFriend")
     public ResultModel<Boolean> isMyFriend(@NotBlank String userId, HttpServletRequest request) {

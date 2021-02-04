@@ -1,7 +1,6 @@
 package net.ysq.webchat.service.impl;
 
 import net.ysq.webchat.dao.FriendRequestMapper;
-import net.ysq.webchat.dao.MyFriendMapper;
 import net.ysq.webchat.po.FriendRequest;
 import net.ysq.webchat.service.FriendRequestService;
 import net.ysq.webchat.service.FriendService;
@@ -28,11 +27,7 @@ public class FriendRequestServiceImpl implements FriendRequestService {
     private FriendRequestMapper friendRequestMapper;
 
     @Autowired
-    private MyFriendMapper myFriendMapper;
-
-    @Autowired
     private Sid sid;
-
 
     /**
      * agreeFriendRequest()上加了@Transactional，

@@ -1,0 +1,84 @@
+html, body {
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
+	overflow: hidden;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+}
+.friend-msg {
+	padding: 8px 60px 0 12px;
+	display: flex;
+	justify-content: flex-start;
+}
+.me-msg {
+	padding: 8px 12px 0 60px;
+	display: flex;
+	justify-content: flex-end;
+}
+.friend-msg img, .me-msg img {
+	height: 42px;
+	max-width: 42px;
+	border-radius: 4px;
+}
+.friend-msg p, .me-msg p {
+	color: black;
+	font-size: 16px;
+	border-radius: 6px;
+	padding: 10px 12px;
+	line-height: 24px;
+	margin-top: 4px;
+}
+.friend-msg p {
+	background-color: white;
+	margin-left: 20px;
+}
+.me-msg p {
+	background-color: #a0e759;
+	margin-right: 20px;
+}
+.content-box {
+	position: relative;
+}
+.friend-msg p:before, .me-msg p::before {
+	width: 0;
+	content: "";
+	position: absolute;
+	border-style: solid;
+	top: 24px;
+}
+.friend-msg p:before {
+	left: 8px;
+	border-color: transparent white;
+	border-width: 0 12px 12px 0;
+}
+.me-msg p::before {
+	right: 8px;
+	border-color: transparent #a0e759;
+	border-width: 0 0 12px 12px;
+}
+
+.footer {
+	/* 不会随着滚动条滚动 */
+	position: fixed; 
+	height: 50px;
+	/* max-height: 88px; */
+	width: 100%;
+	border-top: solid 1px #bbb;
+	left: 0;
+	bottom: 0;
+	background-color: #fafafa;
+	padding: 6px 24px;
+	display: flex;
+	justify-content: space-between;
+}
+.footer textarea {
+	height: 100%;
+	padding: 4px 8px;
+	line-height: 28px;
+	margin-right: 8px;
+}
+.footer button {
+	height: 37px;
+	font-size: 18px;
+}
