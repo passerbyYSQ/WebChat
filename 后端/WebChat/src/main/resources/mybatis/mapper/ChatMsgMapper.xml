@@ -12,4 +12,13 @@
     <result column="sign_flag" jdbcType="INTEGER" property="signFlag" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
+
+<!-- 批量签收 -->
+  <update id="batchUpdateMsgSigned" parameterType="list">
+    update chat_msg set sign_flag=1 where id in
+    <foreach collection="list" item="msgId" open="(" separator="," close=")">
+      #{msgId}
+    </foreach>
+  </update>
+
 </mapper>

@@ -24,14 +24,14 @@ window.app = {
 	/**
 	 * netty服务后端发布的url地址
 	 */
-	nettyServerUrl: 'ws://101.200.79.231:8888/ws',
+	nettyServerUrl: 'ws://192.168.1.4:8888/ws',
 	
 	/**
 	 * 后端服务发布的url地址
 	 * 开发时，服务端和测试手机需要在同一局域网。此处的ip是服务端所在电脑的局域网ip
 	 * 由于是动态分配，所以ip可能会变
 	 */
-	serverUrl: "http://192.168.0.109:8080/v1/api/",  
+	serverUrl: "http://192.168.1.4:8080/v1/api/",  
 	
 	/**
 	 * 图片服务器的url地址
@@ -139,8 +139,9 @@ window.app = {
 		var _this = this;
 		mui.ajax(this.serverUrl + url, {
 			type: type,
+			dataType: "json",
+			// traditional:true, // value可以是数组
 			data: data,
-			// dataType: "json",
 			timeout: 30000 ,// 超时时间为30秒
 			headers: {
 				token: token // 携带token
@@ -202,6 +203,23 @@ window.app = {
 	},
 	
 	/**
+	 * 监听网络状态变化
+	 */
+	listenNetworkChange: function(onDisconnected = function() {}) {
+		document.addEventListener("netchange", function() {
+			// 当网络变化时，获取网络状态。如果网络断开，就做相应的处理
+			var networkType = plus.networkinfo.getCurrentType();
+			if (networkType == plus.networkinfo.CONNECTION_UNKNOW 
+				|| networkType == plus.networkinfo.CONNECTION_NONE) {
+					// 0或1
+				console.log("网络断开");
+				app.showToast("未连接网络", "error");
+				onDisconnected();
+			}
+		});
+	},
+	
+	/**
 	 * android系统下，强制弹出软键盘
 	 */
 	popUpKeybord: function() {
@@ -231,6 +249,7 @@ window.app = {
 	 */
 	userLogout: function(){
 		plus.storage.removeItem("userInfo");
+		// 还要清除联系人列表的缓存
 		var webviews = plus.webview.all();
 		for(var i=0; i<webviews.length; i++) {
 			if (webviews[i].id !== 'login') {
@@ -491,3 +510,6 @@ window.app = {
 	}
 	
 }
+
+
+

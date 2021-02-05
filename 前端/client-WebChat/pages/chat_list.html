@@ -56,13 +56,18 @@
 	<body>
 		<script src="../js/mui.min.js"></script>
 		<script src="../js/app.js"></script>
+		<script src="../js/chat.js"></script>
+		
 		<script type="text/javascript">
 			mui.init();
 			
+			
 			mui.plusReady(function () {
 				loadList();
-				
 				// 注意不要在这里绑定按钮的点击事件，因为loadList()是异步的
+				
+				// websocket初始化
+				CHAT.init();
 			});
 			
 			// 请求后端

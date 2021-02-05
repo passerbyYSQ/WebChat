@@ -110,14 +110,15 @@
 		<script src="../js/mui.min.js"></script>
 		<script src="../js/app.js"></script>
 		<script type="text/javascript">
-			(function($, doc) { // 在{}中$相当于mui，doc相当于document
+			// (function($, doc) { // 在{}中$相当于mui，doc相当于document
 				mui.init();
 				
 				var friend;
+				var me;
 				
 				mui.plusReady(function () {
 					// 我的信息
-					var me = app.getUserGlobalInfo();
+					me = app.getUserGlobalInfo();
 					var curView = plus.webview.currentWebview();
 					// 设置软键盘样式
 					curView.setStyle({
@@ -137,7 +138,10 @@
 					});
 					
 					// 监听输入
-					listenInput();			
+					listenInput();		
+					
+					// 监听发送按钮的点击
+					listenSend();	
 				});
 				
 				
@@ -149,7 +153,7 @@
 				function listenInput() {
 					var content = document.getElementById("content");
 					var send = document.getElementById("send");
-					content.addEventListener("input", function() { // 监听手呼入
+					content.addEventListener("input", function() { // 监听输入
 						console.log(content.value);
 						if(content.value.trim().length > 0) {
 							send.setAttribute("class", "mui-btn mui-btn-green");
@@ -161,8 +165,50 @@
 					});
 				}
 				
+				function listenSend() {
+					var content = document.getElementById("content");
+					var send = document.getElementById("send");
+					send.addEventListener("tap", function() {
+						// 发送之前检查网络连接
+						var networkType = plus.networkinfo.getCurrentType();
+						if (networkType == 0 || networkType == 1) {
+							return app.showToast("未连接网络");
+						}
+						sendMsg(content.value); 
+						
+						content.value = ""; 
+						// 不设置按钮禁用，会遇到：软键盘被收起的问题
+						send.setAttribute("class", "mui-btn mui-btn-gray");
+						send.setAttribute("disabled", "disabled");
+						
+						setTimeout(function() {
+							receiveMsg("你好帅啊");
+						}, 3000);
+					});
+				}
 				
-			}(mui, document));
+				function sendMsg(msg) {
+					var msgList = document.getElementById("msgList");
+					var msgHtml = "<div class='me-msg'><div class='content-box'><p>" + msg + "</p></div><img src='" + me.faceImage + "'></div>";
+					msgList.insertAdjacentHTML("beforeend", msgHtml);
+					// netty 推送
+					
+					scrollToBottom();
+				}
+				
+				function receiveMsg(msg) {
+					var msgList = document.getElementById("msgList");
+					var msgHtml = "<div class='friend-msg'><img src='" + friend.faceImg +"' ><div class='content-box'><p>" + msg + "</p></div></div>";
+					msgList.insertAdjacentHTML("beforeend", msgHtml);
+					
+					// 收到消息的提示音
+					var audioPlayer = plus.audio.createPlayer("../mp3/receive.mp3");
+					audioPlayer.play();
+					
+					scrollToBottom();
+				}
+				
+			// }(mui, document));
 			
 			
 		</script>

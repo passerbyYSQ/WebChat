@@ -104,9 +104,9 @@
 	<script type="text/javascript" charset="utf-8">
 	  	mui.init();
 		
-		document.getElementById("btn").addEventListener("tap", function() {
-			app.showPrompt("标题", "内容");
-		});
+		// document.getElementById("btn").addEventListener("tap", function() {
+		// 	app.showPrompt("标题", "内容");
+		// });
 		
 		// 存储选项卡页面的数组
 		var subPages= [
@@ -149,8 +149,10 @@
 			
 			// 关闭欢迎页或者登录页
 			plus.webview.currentWebview().opener().close();
+			
+			// 监听网络变化
+			app.listenNetworkChange();
 		});
-		
 		
 	</script>
 </body>
