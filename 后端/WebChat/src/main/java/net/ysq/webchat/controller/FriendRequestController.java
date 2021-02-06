@@ -5,6 +5,9 @@ import com.github.pagehelper.PageInfo;
 import net.ysq.webchat.common.PageData;
 import net.ysq.webchat.common.ResultModel;
 import net.ysq.webchat.common.StatusCode;
+import net.ysq.webchat.netty.UserChannelRepository;
+import net.ysq.webchat.netty.entity.MsgActionEnum;
+import net.ysq.webchat.netty.entity.TextMsgModel;
 import net.ysq.webchat.po.FriendRequest;
 import net.ysq.webchat.po.MyFriend;
 import net.ysq.webchat.po.User;
@@ -81,12 +84,16 @@ public class FriendRequestController {
         // 修改数据库记录。如果是同意，还需要往好友列表插入一条数据
         friendRequestService.agreeFriendRequest(requestId, status, myId, friendRequest.getSendUserId());
 
+        // 0：尚未处理；1：同意；2：忽略；3：拒绝
         // netty推送
-        // ...
-        // 如果是忽略，则不推送；
+        // 如果是忽略，则不推送；如果是同意或者拒绝，则推送
 
-        // 否则，推送
-
+        if (status == 1) { // 同意，推送通知，更新好友列表
+            TextMsgModel model = new TextMsgModel();
+            model.setAction(MsgActionEnum.PULL_FRIEND.type);
+            // 我处理请求，说明我是这条申请的接收者
+            UserChannelRepository.pushMsg(friendRequest.getSendUserId(), model);
+        }
 
         return ResultModel.success();
     }
@@ -158,8 +165,10 @@ public class FriendRequestController {
             friendRequestService.reSendFriendRequest(friendRequest.getId(), content);
         }
 
-        // netty推送
-        // ...
+        // netty推送好友申请
+        TextMsgModel msgModel = new TextMsgModel();
+        msgModel.setAction(MsgActionEnum.FRIEND_REQUEST.type);
+        UserChannelRepository.pushMsg(receiver.getId(), msgModel);
 
         return ResultModel.success();
     }

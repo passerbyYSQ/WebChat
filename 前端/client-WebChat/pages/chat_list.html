@@ -9,7 +9,7 @@
 		<link rel="stylesheet" href="../css/common.css">
 		
 		<style type="text/css">
-			.mui-media-body {
+			#list .mui-media-body {
 				padding-right: 28px;
 			}
 			.btn-group {
@@ -28,7 +28,7 @@
 		</header>
 		
 		<div class="mui-content">
-			<ul id="list" class="mui-table-view"> 
+			<!-- <ul id="list" class="mui-table-view"> 
 				<li class="mui-table-view-cell mui-collapse">
 					<a class="mui-navigate-right" href="#">
 						<img class="mui-media-object mui-pull-left" src="../imgs/face-cat.jpg">
@@ -50,6 +50,18 @@
 						</div>
 					</div>
 				</li>
+			</ul> -->
+			
+			<ul id="chatSnapshotList" class="mui-table-view">
+				<!-- <li class="mui-table-view-cell mui-media">
+					<a href="javascript:;">
+						<img class="mui-media-object mui-pull-left" src="../imgs/face-cat.jpg">
+						<div class="mui-media-body">
+							幸福
+							<p class="mui-ellipsis">能和心爱的人一起睡觉，是件幸福的事情；可是，打呼噜怎么办？</p>
+						</div>
+					</a>
+				</li> -->
 			</ul>
 		</div>
 
@@ -61,17 +73,48 @@
 		<script type="text/javascript">
 			mui.init();
 			
-			
 			mui.plusReady(function () {
-				loadList();
-				// 注意不要在这里绑定按钮的点击事件，因为loadList()是异步的
+				// loadRequestList();
+				// 注意不要在这里绑定按钮的点击事件，因为loadRequestList()是异步的
 				
 				// websocket初始化
 				CHAT.init();
+				
+				// 加载聊天快照列表
+				loadChatSnapshot();
 			});
 			
-			// 请求后端
-			function loadList() {
+			// 渲染聊天快照列表
+			function loadChatSnapshot() {
+				var me = app.getUserGlobalInfo();
+				var chatSnapshotList = app.getUserChatSnapshot(me.id);
+				var html = "";
+				for(var i=0; i<chatSnapshotList.length; i++) {
+					var chatSnapshot = chatSnapshotList[i];
+					var friend = app.getFriendFromContactList(chatSnapshot.friendId);
+					html += ("<li id='ChatSnapshot_" + friend.userId +"' class='mui-table-view-cell mui-media'><a href='javascript:;'>" +
+							"<img class='mui-media-object mui-pull-left' src='" + friend.faceImg + "'>" +
+							"<div class='mui-media-body'>" + friend.username + "<p class='mui-ellipsis'>" + chatSnapshot.msg + "</p></div></a></li>");
+				}
+				var chatSnapshotBox = document.getElementById("chatSnapshotList");
+				chatSnapshotBox.innerHTML = html;
+			}
+			
+			// 更新快照列表
+			function updateChatSnapshot(friendId, msg) { // 最后一条消息
+				var friend = app.getFriendFromContactList(friendId);
+				// 先移除旧快照
+				document.getElementById("ChatSnapshot_" + friend.userId).remove();
+				// 再在头部插入新快照
+				var chatSnapshotBox = document.getElementById("chatSnapshotList"); 
+				var html = ("<li id='ChatSnapshot_" + friend.userId +"' class='mui-table-view-cell mui-media'><a href='javascript:;'>" +
+							"<img class='mui-media-object mui-pull-left' src='" + friend.faceImg + "'>" +
+							"<div class='mui-media-body'>" + friend.username + "<p class='mui-ellipsis'>" + msg + "</p></div></a></li>");
+				chatSnapshotBox.insertAdjacentHTML("afterbegin", html);
+			}
+			
+			// 请求获取好友申请列表
+			function loadRequestList() {
 				app.ajax("friendRequest/list", {
 					page: 1,
 					count: 10
@@ -94,14 +137,14 @@
 					requestId: requestId,
 					status: status
 				}, function(res) {
-					loadList(); // 重新加载列表
+					loadRequestList(); // 重新加载列表
 				}, "post", null, function(res) {
 					app.showToast(res.msg, "error");
-					loadList(); // 重新加载列表
+					loadRequestList(); // 重新加载列表
 				});
 			}
 			
-			// 根据返回数据，拼接html
+			// 拼接好友请求列表
 			function joinHtml(list) {
 				var status = ['未处理', "已同意", "已忽略", "已拒绝"];
 				var html = "";

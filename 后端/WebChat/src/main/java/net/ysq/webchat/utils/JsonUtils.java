@@ -15,6 +15,7 @@ public class JsonUtils {
 
     static {
         MAPPER = SpringUtils.getBean(ObjectMapper.class);
+//        MAPPER = new ObjectMapper();
     }
 
     /**

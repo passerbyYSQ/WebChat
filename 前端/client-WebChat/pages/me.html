@@ -147,7 +147,7 @@
 				var user = app.getUserGlobalInfo();
 				document.getElementById("phone").innerHTML = user.phone;
 				document.getElementById("username").innerHTML = user.username;
-				console.log(user.qrcode);
+				// console.log(user.qrcode);
 				if (app.isNotBlank(user.faceImage)) {
 					document.getElementById("faceImage").src = user.faceImage; // 阿里oss
 				}

@@ -27,78 +27,19 @@
 		</header>
 		<div class="mui-content" id="msgList">
 			
-					<div class="friend-msg">
-						<img src="../imgs/face-cat.jpg" >
-						<div class="content-box">
-							<p>当软键盘弹出后，我们的聊天窗口会从原来的全屏调整为半屏，对当前的窗i件</p>
-						</div>
-					</div>
-					<div class="me-msg">
-						<div class="content-box">
-							<p>当软键盘弹出后，我们的聊天窗口会从原来的全屏调整为半屏，对当前的窗i件</p>
-						</div>
-						<img src="../imgs/bird.png" >
-					</div>
-					<div class="friend-msg">
-						<img src="../imgs/face-cat.jpg" >
-						<div class="content-box">
-							<p>当软键盘弹出后，我们的聊天窗口会从原来的全屏调整为半屏，对当前的窗i件</p>
-						</div>
-					</div>
-					<div class="me-msg">
-						<div class="content-box">
-							<p>当软键盘弹出后，我们的聊天窗口会从原来的全屏调整为半屏，对当前的窗i件</p>
-						</div>
-						<img src="../imgs/bird.png" >
-					</div>
-					<div class="friend-msg">
-						<img src="../imgs/face-cat.jpg" >
-						<div class="content-box">
-							<p>当软键盘弹出后，我们的聊天窗口会从原来的全屏调整为半屏，对当前的窗i件</p>
-						</div>
-					</div>
-					<div class="me-msg">
-						<div class="content-box">
-							<p>当软键盘弹出后，我们的聊天窗口会从原来的全屏调整为半屏，对当前的窗i件</p>
-						</div>
-						<img src="../imgs/bird.png" >
-					</div>
-					<div class="friend-msg">
-						<img src="../imgs/face-cat.jpg" >
-						<div class="content-box">
-							<p>当软键盘弹出后，我们的聊天窗口会从原来的全屏调整为半屏，对当前的窗i件</p>
-						</div>
-					</div>
-					<div class="me-msg">
-						<div class="content-box">
-							<p>当软键盘弹出后，我们的聊天窗口会从原来的全屏调整为半屏，对当前的窗i件</p>
-						</div>
-						<img src="../imgs/bird.png" >
-					</div>
-					<div class="friend-msg">
-						<img src="../imgs/face-cat.jpg" >
-						<div class="content-box">
-							<p>当软键盘弹出后，我们的聊天窗口会从原来的全屏调整为半屏，对当前的窗i件</p>
-						</div>
-					</div>
-					<div class="me-msg">
-						<div class="content-box">
-							<p>当软键盘弹出后，我们的聊天窗口会从原来的全屏调整为半屏，对当前的窗i件</p>
-						</div>
-						<img src="../imgs/bird.png" >
-					</div>
-					<div class="friend-msg">
-						<img src="../imgs/face-cat.jpg" >
-						<div class="content-box">
-							<p>当软键盘弹出后，我们的聊天窗口会从原来的全屏调整为半屏，对当前的窗i件</p>
-						</div>
-					</div>
-					<div class="me-msg">
-						<div class="content-box">
-							<p>当软键盘弹出后，我们的聊天窗口会从原来的全屏调整为半屏，对当前的窗i件</p>
-						</div>
-						<img src="../imgs/bird.png" >
-					</div>
+			<div class="friend-msg">
+				<img src="../imgs/face-cat.jpg" >
+				<div class="content-box">
+					<p>https://www.baidu.com/s?ie=utf-8&f=8&rsv_bp=1&srcqid=4993505787786792320&tn=50000021_hao_pg&wd=%E9%98%BF%E9%87%8C%E4%BA%91&oq=insertAdjacentHTML&rsv_pq=e4eb7bc10015614b&rsv_t=38c5hc1UE7FK8EL%2FgF2L3LMasXF24ekmkU0PXVQINpMjl48Ilg00EgtPagqK%2FeJyBz4Q5YHR&rqlang=cn&rsv_enter=0&rsv_dl=tb&rsv_btype=t&rsv_sug3=28&rsv_sug1=17&rsv_sug7=100&rsv_sug2=0&inputT=2647&rsv_sug4=2647</p>
+				</div>
+			</div>
+			<div class="me-msg">
+				<div class="content-box">
+					<p>当软键盘弹出后，我们的聊天窗口会从原来的全屏调整为半屏，对当前的窗i件</p>
+				</div>
+				<img src="../imgs/bird.png" >
+			</div>
+					
 		</div>
 			
 		
@@ -111,106 +52,140 @@
 		<script src="../js/app.js"></script>
 		<script type="text/javascript">
 			// (function($, doc) { // 在{}中$相当于mui，doc相当于document
-				mui.init();
+			mui.init();
+			
+			var friend;
+			var me;
+			
+			mui.plusReady(function () {
+				// 我的信息
+				me = app.getUserGlobalInfo();
 				
-				var friend;
-				var me;
+				var curView = plus.webview.currentWebview();
+				// 设置软键盘样式
+				curView.setStyle({
+					//自动调整Webview窗口大小（屏幕区域减去软键盘区域），同时自动滚动Webview保证输入框可见
+					softinputMode: "adjustResize"
+				});
+				// 好友信息
+				friend = JSON.parse(curView.friendJson);
 				
-				mui.plusReady(function () {
-					// 我的信息
-					me = app.getUserGlobalInfo();
-					var curView = plus.webview.currentWebview();
-					// 设置软键盘样式
-					curView.setStyle({
-						//自动调整Webview窗口大小（屏幕区域减去软键盘区域），同时自动滚动Webview保证输入框可见
-						softinputMode: "adjustResize"
-					});
-					
-					// 好友信息
-					friend = JSON.parse(curView.friendJson);
-					// 标题栏
-					document.getElementById("title").innerHTML = friend.username; // 备注名功能之后再完善
-					
-					// 聊天列表滚动到底部
+				// 标题栏
+				document.getElementById("title").innerHTML = friend.username; // 备注名功能之后再完善
+				
+				// 初始化聊天记录，并渲染到页面上
+				initChatHistory();
+				
+				// 监听窗口变化
+				window.addEventListener("resize", function() {
 					scrollToBottom();
-					window.addEventListener("resize", function() {
-						scrollToBottom();
-					});
-					
-					// 监听输入
-					listenInput();		
-					
-					// 监听发送按钮的点击
-					listenSend();	
 				});
 				
+				// 监听输入
+				listenInput();		
 				
-				function scrollToBottom() {
-					var msgList = document.getElementById("msgList");
-					msgList.scrollTop = msgList.scrollHeight - msgList.offsetHeight;
-				}
-				
-				function listenInput() {
-					var content = document.getElementById("content");
-					var send = document.getElementById("send");
-					content.addEventListener("input", function() { // 监听输入
-						console.log(content.value);
-						if(content.value.trim().length > 0) {
-							send.setAttribute("class", "mui-btn mui-btn-green");
-							send.removeAttribute("disabled");
-						} else {
-							send.setAttribute("class", "mui-btn mui-btn-gray");
-							send.setAttribute("disabled", "disabled");
-						}
-					});
-				}
-				
-				function listenSend() {
-					var content = document.getElementById("content");
-					var send = document.getElementById("send");
-					send.addEventListener("tap", function() {
-						// 发送之前检查网络连接
-						var networkType = plus.networkinfo.getCurrentType();
-						if (networkType == 0 || networkType == 1) {
-							return app.showToast("未连接网络");
-						}
-						sendMsg(content.value); 
-						
-						content.value = ""; 
-						// 不设置按钮禁用，会遇到：软键盘被收起的问题
+				// 监听发送按钮的点击
+				listenSend();	
+			});
+			
+			
+			function scrollToBottom() {
+				var msgList = document.getElementById("msgList");
+				msgList.scrollTop = msgList.scrollHeight - msgList.offsetHeight;
+			}
+			
+			function listenInput() {
+				var content = document.getElementById("content");
+				var send = document.getElementById("send");
+				content.addEventListener("input", function() { // 监听输入
+					// console.log(content.value);
+					if(content.value.trim().length > 0) {
+						send.setAttribute("class", "mui-btn mui-btn-green");
+						send.removeAttribute("disabled");
+					} else {
 						send.setAttribute("class", "mui-btn mui-btn-gray");
 						send.setAttribute("disabled", "disabled");
-						
-						setTimeout(function() {
-							receiveMsg("你好帅啊");
-						}, 3000);
-					});
+					}
+				});
+			}
+			
+			function listenSend() {
+				var content = document.getElementById("content");
+				var send = document.getElementById("send");
+				send.addEventListener("tap", function() {
+					// 发送之前检查网络连接
+					var networkType = plus.networkinfo.getCurrentType();
+					if (networkType == 0 || networkType == 1) {
+						return app.showToast("未连接网络");
+					}
+					sendMsg(content.value); 
+					
+					content.value = ""; 
+					// 不设置按钮禁用，会遇到：软键盘被收起的问题
+					send.setAttribute("class", "mui-btn mui-btn-gray");
+					send.setAttribute("disabled", "disabled");
+				});
+			}
+			
+			// 初始化聊天记录，并渲染到页面上
+			function initChatHistory() {
+				var msgList = document.getElementById("msgList");
+				var chatHistoryList = app.getUserChatHistory(me.id, friend.userId);
+				// console.log(JSON.stringify(chatHistoryList));
+				var html = "";
+				for(var i=0; i<chatHistoryList.length; i++) {
+					var chatHistory = chatHistoryList[i];
+					if (chatHistory.flag == 1) { // 1：我发送的
+						html += ("<div class='me-msg'><div class='content-box'><p>" + chatHistory.msg + "</p></div><img src='" + me.faceImage + "'></div>");
+					} else { // 2：好友发送的
+						html += ("<div class='friend-msg'><img src='" + friend.faceImg +"' ><div class='content-box'><p>" + chatHistory.msg + "</p></div></div>");
+					}
 				}
+				msgList.innerHTML = html;
 				
-				function sendMsg(msg) {
-					var msgList = document.getElementById("msgList");
-					var msgHtml = "<div class='me-msg'><div class='content-box'><p>" + msg + "</p></div><img src='" + me.faceImage + "'></div>";
-					msgList.insertAdjacentHTML("beforeend", msgHtml);
-					// netty 推送
-					
-					scrollToBottom();
-				}
+				// 聊天列表滚动到底部
+				scrollToBottom();
+			}
+			
+			function sendMsg(msg) {
+				var msgList = document.getElementById("msgList");
+				var msgHtml = "<div class='me-msg'><div class='content-box'><p>" + msg + "</p></div><img src='" + me.faceImage + "'></div>";
+				msgList.insertAdjacentHTML("beforeend", msgHtml);
 				
-				function receiveMsg(msg) {
-					var msgList = document.getElementById("msgList");
-					var msgHtml = "<div class='friend-msg'><img src='" + friend.faceImg +"' ><div class='content-box'><p>" + msg + "</p></div></div>";
-					msgList.insertAdjacentHTML("beforeend", msgHtml);
-					
-					// 收到消息的提示音
-					var audioPlayer = plus.audio.createPlayer("../mp3/receive.mp3");
-					audioPlayer.play();
-					
-					scrollToBottom();
-				}
+				// 滚动到底部
+				scrollToBottom();
+				// netty 推送
+				
+				// 构建消息实体
+				var textMsg = new app.TextMsg(me.id, friend.userId, msg, null);
+				var msgModel = new app.TextMsgModel(app.action.CHAT, textMsg, null);
+				
+				var wsView = plus.webview.getWebviewById("chat_list");
+				wsView.evalJS("CHAT.send('" + JSON.stringify(msgModel) + "')");
+				
+				// 将聊天记录保存到本地缓存
+				app.saveUserChatHistory(me.id, friend.userId, msg, 1); // 1：我发送的
+				// 更新聊天快照的本地缓存
+				app.saveUserChatSnapshot(me.id, friend.userId, msg, true); // 我发送的消息，对于我来说，肯定是已读的
+				
+				// 更新快照列表
+				var chatListView = plus.webview.getWebviewById("chat_list");
+				chatListView.evalJS("updateChatSnapshot('" + friend.userId + "', '" + msg +"')");
+			}
+			
+			function receiveMsg(msg) {
+				var msgList = document.getElementById("msgList");
+				var msgHtml = "<div class='friend-msg'><img src='" + friend.faceImg +"' ><div class='content-box'><p>" + msg + "</p></div></div>";
+				msgList.insertAdjacentHTML("beforeend", msgHtml);
+				
+				// 收到消息的提示音
+				var audioPlayer = plus.audio.createPlayer("../mp3/receive.mp3");
+				audioPlayer.play();
+				
+				scrollToBottom();
+			}
 				
 			// }(mui, document));
-			
-			
 		</script>
 	</body>
 

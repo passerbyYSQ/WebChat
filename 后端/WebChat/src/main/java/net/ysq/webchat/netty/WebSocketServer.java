@@ -2,6 +2,7 @@ package net.ysq.webchat.netty;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -37,14 +38,22 @@ public class WebSocketServer {
         server = new ServerBootstrap();
         server.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
+                // 设置其他一些参数
                 .childHandler(new WsChannelInitializer());
     }
 
     public void start() {
-        this.future = server.bind(8081);
-        if (future.isSuccess()) {
-            System.out.println("启动 Netty 成功");
-        }
+        future = server.bind(8081);
+        future.addListener(new ChannelFutureListener() {
+            @Override
+            public void operationComplete(ChannelFuture future) throws Exception {
+                if (future.isSuccess()) {
+                    System.out.println("netty websocket server 异步启动成功");
+                } else {
+                    System.out.println("netty websocket server 异步启动失败");
+                }
+            }
+        });
     }
 }
 
