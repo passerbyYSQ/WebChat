@@ -13,10 +13,26 @@
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
 
-<!-- 批量签收 -->
-  <update id="batchUpdateMsgSigned" parameterType="list">
-    update chat_msg set sign_flag=1 where id in
-    <foreach collection="list" item="msgId" open="(" separator="," close=")">
+  <!-- 查询所有未签收的消息 -->
+  <select id="getUnsignedMsg" parameterType="String"
+          resultType="net.ysq.webchat.netty.entity.SingleChatMsgResponse">
+    select
+        id msgId,
+        send_user_id senderId,
+        msg content,
+        create_time time
+    from chat_msg
+    where accept_user_id=#{receiverId} and sign_flag=0
+    order by create_time
+  </select>
+
+  <!-- 批量签收 -->
+  <update id="batchUpdateMsgSigned" parameterType="map">
+    update chat_msg set sign_flag=1
+    where
+          accept_user_id=#{receiverId} and
+          id in
+    <foreach collection="msgIdList" item="msgId" open="(" separator="," close=")">
       #{msgId}
     </foreach>
   </update>

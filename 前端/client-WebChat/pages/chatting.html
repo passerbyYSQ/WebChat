@@ -27,10 +27,10 @@
 		</header>
 		<div class="mui-content" id="msgList">
 			
-			<div class="friend-msg">
+			<!-- <div class="friend-msg">
 				<img src="../imgs/face-cat.jpg" >
 				<div class="content-box">
-					<p>https://www.baidu.com/s?ie=utf-8&f=8&rsv_bp=1&srcqid=4993505787786792320&tn=50000021_hao_pg&wd=%E9%98%BF%E9%87%8C%E4%BA%91&oq=insertAdjacentHTML&rsv_pq=e4eb7bc10015614b&rsv_t=38c5hc1UE7FK8EL%2FgF2L3LMasXF24ekmkU0PXVQINpMjl48Ilg00EgtPagqK%2FeJyBz4Q5YHR&rqlang=cn&rsv_enter=0&rsv_dl=tb&rsv_btype=t&rsv_sug3=28&rsv_sug1=17&rsv_sug7=100&rsv_sug2=0&inputT=2647&rsv_sug4=2647</p>
+					<p>【【【【【【【【【【【【【【【【【【【【】】】】】】】】】】】】】】】】】】】】</p>
 				</div>
 			</div>
 			<div class="me-msg">
@@ -38,7 +38,7 @@
 					<p>当软键盘弹出后，我们的聊天窗口会从原来的全屏调整为半屏，对当前的窗i件</p>
 				</div>
 				<img src="../imgs/bird.png" >
-			</div>
+			</div> -->
 					
 		</div>
 			
@@ -157,20 +157,22 @@
 				// netty 推送
 				
 				// 构建消息实体
-				var textMsg = new app.TextMsg(me.id, friend.userId, msg, null);
-				var msgModel = new app.TextMsgModel(app.action.CHAT, textMsg, null);
-				
+				var msgModel = new app.MsgModel(app.action.CHAT, {
+					receiverId: friend.userId,
+					content: msg
+				});
 				var wsView = plus.webview.getWebviewById("chat_list");
 				wsView.evalJS("CHAT.send('" + JSON.stringify(msgModel) + "')");
 				
+				var timestamp = new Date().getTime();
 				// 将聊天记录保存到本地缓存
 				app.saveUserChatHistory(me.id, friend.userId, msg, 1); // 1：我发送的
 				// 更新聊天快照的本地缓存
-				app.saveUserChatSnapshot(me.id, friend.userId, msg, true); // 我发送的消息，对于我来说，肯定是已读的
+				app.saveUserChatSnapshot(me.id, friend.userId, msg, true, timestamp); // 我发送的消息，对于我来说，肯定是已读的
 				
 				// 更新快照列表
 				var chatListView = plus.webview.getWebviewById("chat_list");
-				chatListView.evalJS("updateChatSnapshot('" + friend.userId + "', '" + msg +"')");
+				chatListView.evalJS("updateChatSnapshot('" + friend.userId + "', '" + msg +"', true, '" + timestamp + "')");
 			}
 			
 			function receiveMsg(msg) {

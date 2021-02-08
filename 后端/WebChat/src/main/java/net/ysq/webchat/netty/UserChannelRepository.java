@@ -6,8 +6,10 @@ import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.GlobalEventExecutor;
-import net.ysq.webchat.netty.entity.TextMsgModel;
+import net.ysq.webchat.netty.entity.MsgModel;
 import net.ysq.webchat.utils.JsonUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -21,43 +23,57 @@ import java.util.concurrent.ConcurrentHashMap;
  * @create 2021-02-05 23:20
  */
 public class UserChannelRepository {
+    private final static Logger logger = LoggerFactory.getLogger(UserChannelRepository.class);
 
-    private static ChannelGroup CHANNEL_GROUP = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+    public static ChannelGroup CHANNEL_GROUP = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
     private static Map<String, Channel> USER_CHANNEL = new ConcurrentHashMap<>();
 
-    public static void bind(String userId, Channel channel) {
+    public static synchronized void bind(String userId, Channel channel) {
         // 此时channel一定已经在ChannelGroup中了
+
+        // 之前已经绑定过了，移除并释放掉之前绑定的channel
+        if (USER_CHANNEL.containsKey(userId)) { // map  userId --> channel
+            Channel oldChannel = USER_CHANNEL.get(userId);
+            CHANNEL_GROUP.remove(oldChannel);
+            oldChannel.close();
+        }
 
         // 双向绑定
         // channel -> userId
         AttributeKey<String> key = AttributeKey.valueOf("userId");
         channel.attr(key).set(userId);
+
         // userId -> channel
         USER_CHANNEL.put(userId, channel);
     }
 
-    public static Channel get(String userId) {
-        return USER_CHANNEL.get(userId);
+    /**
+     * 从通道中获取userId。只要userId和channel绑定周，这个方法就一定能获取的到
+     * @param channel
+     * @return
+     */
+    public static String getUserId(Channel channel) {
+        AttributeKey<String> key = AttributeKey.valueOf("userId");
+        return channel.attr(key).get();
     }
 
     public static void add(Channel channel) {
         CHANNEL_GROUP.add(channel);
     }
 
-    public static void remove(Channel channel) {
-        // 移除映射关系： userId -> channel
-        AttributeKey<String> key = AttributeKey.valueOf("userId");
-        String userId = channel.attr(key).get();
-        System.out.println("-----");
-        System.out.println(userId);
-        System.out.println(USER_CHANNEL);
+    public static synchronized void remove(Channel channel) {
+        String userId = getUserId(channel);
+
         // userId有可能为空。可能chanelActive之后，由于前端原因（或者网络原因）没有及时绑定userId。
-        // 此时netty认为channelInactive了，就移除通道，就会调用此处。这里的userId就是null
+        // 此时netty认为channelInactive了，就移除通道，这时userId就是null
         if (!StringUtils.isEmpty(userId)) {
-            USER_CHANNEL.remove(userId);
+            USER_CHANNEL.remove(userId); // map
         }
 
         CHANNEL_GROUP.remove(channel);
+
+        // 关闭channel
+        channel.close();
     }
 
     /**
@@ -66,37 +82,35 @@ public class UserChannelRepository {
      * @return      在线就返回对应的channel，不在线返回null
      */
     public static Channel isOnline(String userId) {
-        Channel channel = USER_CHANNEL.get(userId);
+        Channel channel = USER_CHANNEL.get(userId); // map
         if (ObjectUtils.isEmpty(channel)) {
             return null;
         }
         return CHANNEL_GROUP.find(channel.id());
     }
 
-    public static void pushMsg(String receiverId, TextMsgModel msgModel) {
+    public static void pushMsg(String receiverId, MsgModel msgModel) {
         Channel receiverChannel = isOnline(receiverId);
         if (!ObjectUtils.isEmpty(receiverChannel)) {
             // 在线，就推送；离线，不做处理
             String json = JsonUtils.objectToJson(msgModel);
             TextWebSocketFrame frame = new TextWebSocketFrame(json);
             receiverChannel.writeAndFlush(frame);
-            System.out.println("消息推送：" + msgModel.getMsg().getContent());
         } else {
             // 离线状态
-            System.out.println(receiverId + "用户离线");
+            logger.info("{} 用户离线", receiverId);
         }
     }
 
 
-    public static void print() {
-        System.out.println("所有通道的长id：");
+    public synchronized static void print() {
+        logger.info("所有通道的长id：");
         for (Channel channel : CHANNEL_GROUP) {
-            System.out.println(channel.id().asLongText());
+            logger.info(channel.id().asLongText());
         }
-        System.out.println("userId -> channel 的映射：");
+        logger.info("userId -> channel 的映射：");
         for (Map.Entry<String, Channel> entry : USER_CHANNEL.entrySet()) {
-            System.out.println("userId:" + entry.getKey() + "--->"
-                    + "channelId:" + entry.getValue().id().asLongText());
+            logger.info("userId: {} ---> channelId: {}", entry.getKey(), entry.getValue().id().asLongText());
         }
     }
 

@@ -9,8 +9,13 @@
 		<link rel="stylesheet" href="../css/common.css">
 		
 		<style type="text/css">
-			#list .mui-media-body {
-				padding-right: 28px;
+			.title {
+				display: flex;
+				justify-content: space-between;
+			}
+			.mui-ellipsis {
+				display: block;
+				margin-right: 24px;
 			}
 			.btn-group {
 				margin-top: 8px !important;
@@ -19,6 +24,27 @@
 			}
 			.btn-group button {
 				padding: 4px 20px;
+			}
+			
+			/* 消息红点 */
+			.red-point {
+				position: relative;
+			}
+			.red-point::before {
+				/* 必须设置content，否则无效 */
+				content: "";
+				position: absolute;
+				display: block;
+				background-color: #f00;
+				width: 10px;
+				height: 10px;
+				border-radius: 50%;
+				left: 53px;
+				top: 7px;
+			}
+			
+			.mui-slider-right {
+				padding-bottom: 1px;
 			}
 		</style>
 	</head>
@@ -53,15 +79,21 @@
 			</ul> -->
 			
 			<ul id="chatSnapshotList" class="mui-table-view">
-				<!-- <li class="mui-table-view-cell mui-media">
-					<a href="javascript:;">
+				<li class="mui-table-view-cell mui-media">
+					<div class="mui-slider-right mui-disabled">
+						<button class="mui-btn mui-btn-red">删除</button>
+					</div>
+					<a href="javascript:;" class="red-point mui-slider-handle">
 						<img class="mui-media-object mui-pull-left" src="../imgs/face-cat.jpg">
 						<div class="mui-media-body">
-							幸福
+							<div class="title">
+								<span class="mui-ellipsis">幸福1111幸福111幸福1111幸福111幸福1111幸福111</span>
+								<p>3秒前</p>
+							</div>
 							<p class="mui-ellipsis">能和心爱的人一起睡觉，是件幸福的事情；可是，打呼噜怎么办？</p>
 						</div>
 					</a>
-				</li> -->
+				</li>
 			</ul>
 		</div>
 
@@ -91,25 +123,73 @@
 				var html = "";
 				for(var i=0; i<chatSnapshotList.length; i++) {
 					var chatSnapshot = chatSnapshotList[i];
+					console.log(JSON.stringify(chatSnapshot));
 					var friend = app.getFriendFromContactList(chatSnapshot.friendId);
-					html += ("<li id='ChatSnapshot_" + friend.userId +"' class='mui-table-view-cell mui-media'><a href='javascript:;'>" +
-							"<img class='mui-media-object mui-pull-left' src='" + friend.faceImg + "'>" +
-							"<div class='mui-media-body'>" + friend.username + "<p class='mui-ellipsis'>" + chatSnapshot.msg + "</p></div></a></li>");
+					var friendJson = JSON.stringify(friend);
+					var redPoint = "";
+					if (!chatSnapshot.isRead) { // 未读
+						redPoint = "red-point";
+					}
+					html += ("<li id='ChatSnapshot_" + friend.userId +"' friendJson='" + friendJson +"' class='mui-table-view-cell mui-media'>" +
+					"<div class='mui-slider-right mui-disabled'><button friendId='" + friend.userId + "' class='mui-btn mui-btn-red'>删除</button></div>" +
+							"<a href='javascript:;' class='mui-slider-handle " + redPoint + "'><img class='mui-media-object mui-pull-left' src='" + friend.faceImg + "'>" +
+							"<div class='mui-media-body'><div class='title'><span class='mui-ellipsis'>" + friend.username + "</span><p>" + app.formatDate(chatSnapshot.timestamp) 
+							+ "</p></div><p class='mui-ellipsis'>" + chatSnapshot.msg + "</p></div></a></li>");
 				}
 				var chatSnapshotBox = document.getElementById("chatSnapshotList");
 				chatSnapshotBox.innerHTML = html;
+				
+				// 为快照列表批量绑定点击事件
+				mui("#chatSnapshotList").on("tap", "li", function() {
+					var friendJson = this.getAttribute("friendJson");
+					var friendObj = JSON.parse(friendJson);
+					mui.openWindow({
+						url: "chatting.html",
+						id: "chatting_with_" + friendObj.userId,
+						extras: {
+							friendJson: friendJson
+						}
+					});
+					// 更新快照的状态为已读
+					app.readUserChatSnapShot(me.id, friendObj.userId);
+					// 更新界面
+					var redPoint = this.querySelector(".red-point");
+					if (app.isNotNull(redPoint)) {
+						redPoint.setAttribute("class", "mui-slider-handle"); // 去除红点
+					}
+				});
+				mui("#chatSnapshotList").on("tap", ".mui-btn-red", function() {
+					var friendId = this.getAttribute("friendId");
+					// 移除当前li
+					document.getElementById("ChatSnapshot_" + friendId).remove();
+					// 删除当前登录用户和好友的聊天记录
+					app.deleteUserChatHistory(me.id, friendId);
+					// 删除快照
+					app.deleteUserChatSnapshot(me.id, friendId);
+				});
+				
 			}
 			
 			// 更新快照列表
-			function updateChatSnapshot(friendId, msg) { // 最后一条消息
+			function updateChatSnapshot(friendId, msg, isRead, timestamp) { // 最后一条消息
+				
+				var oldLi = document.getElementById("ChatSnapshot_" + friendId);
+				if (app.isNotNull(oldLi)) {
+					oldLi.remove();
+				}
 				var friend = app.getFriendFromContactList(friendId);
-				// 先移除旧快照
-				document.getElementById("ChatSnapshot_" + friend.userId).remove();
-				// 再在头部插入新快照
+				var friendJson = JSON.stringify(friend);
+				// 在头部插入新快照
 				var chatSnapshotBox = document.getElementById("chatSnapshotList"); 
-				var html = ("<li id='ChatSnapshot_" + friend.userId +"' class='mui-table-view-cell mui-media'><a href='javascript:;'>" +
-							"<img class='mui-media-object mui-pull-left' src='" + friend.faceImg + "'>" +
-							"<div class='mui-media-body'>" + friend.username + "<p class='mui-ellipsis'>" + msg + "</p></div></a></li>");
+				var redPoint = "";
+				if (!isRead) { // 未读
+					redPoint = "red-point";
+				}
+				var html = ("<li id='ChatSnapshot_" + friend.userId +"' friendJson='" + friendJson +"' class='mui-table-view-cell mui-media'>" +
+							"<div class='mui-slider-right mui-disabled'><button friendId='" + friend.userId + "' class='mui-btn mui-btn-red'>删除</button></div>" +
+							"<a href='javascript:;' class='mui-slider-handle " + redPoint + "'><img class='mui-media-object mui-pull-left' src='" + friend.faceImg + "'>" +
+							"<div class='mui-media-body'><div class='title'><span class='mui-ellipsis'>" + friend.username + "</span><p>" + app.formatDate(timestamp) + 
+							"</p></div><p class='mui-ellipsis'>" + msg + "</p></div></a></li>");
 				chatSnapshotBox.insertAdjacentHTML("afterbegin", html);
 			}
 			

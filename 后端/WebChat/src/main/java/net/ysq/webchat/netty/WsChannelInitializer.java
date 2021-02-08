@@ -7,6 +7,7 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
+import io.netty.handler.timeout.IdleStateHandler;
 
 /**
  * @author passerbyYSQ
@@ -20,9 +21,18 @@ public class WsChannelInitializer extends ChannelInitializer<SocketChannel> {
         pipeline.addLast(new HttpServerCodec())
                 .addLast(new ChunkedWriteHandler())
                 // 对httpMessage进行聚合处理，聚合成request或response
-                .addLast(new HttpObjectAggregator(1024*64))
+                .addLast(new HttpObjectAggregator(1024 * 64))
                 // 处理握手和心跳
                 .addLast(new WebSocketServerProtocolHandler("/ws"))
+
+                // 注意。关于心跳的两个handler在pipeline中的顺序不能更改
+                // IdleStateHandler一旦检查到空闲状态发生，会触发IdleStateEvent事件并且交给下一个handler处理
+                // 下一个handler必须实现userEventTriggered方法处理对应事件
+                .addLast(new IdleStateHandler(6, 8, 12))
+                // 空闲状态检查的handler
+                .addLast(new HeartBeatHandler())
+
+
                 // 自定义的业务的handler
                 .addLast(new TextMsgHandler());
     }
