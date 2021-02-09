@@ -22,7 +22,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/**")
                 // 路径不包括contextPath部分
-                .excludePathPatterns("/user/login");
+                .excludePathPatterns("/user/login", "/user/logout", "/index/test1");
     }
 
     /**

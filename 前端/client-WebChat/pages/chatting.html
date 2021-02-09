@@ -27,7 +27,7 @@
 		</header>
 		<div class="mui-content" id="msgList">
 			
-			<!-- <div class="friend-msg">
+			<div class="friend-msg">
 				<img src="../imgs/face-cat.jpg" >
 				<div class="content-box">
 					<p>【【【【【【【【【【【【【【【【【【【【】】】】】】】】】】】】】】】】】】】】</p>
@@ -38,13 +38,14 @@
 					<p>当软键盘弹出后，我们的聊天窗口会从原来的全屏调整为半屏，对当前的窗i件</p>
 				</div>
 				<img src="../imgs/bird.png" >
-			</div> -->
+			</div>
 					
 		</div>
 			
 		
 		<div class="footer">
-			<textarea id="content"></textarea>
+			<!-- <textarea id="content"></textarea> -->
+			<div class="editable" id="content" contenteditable="true"></div>
 			<button id="send" disabled type="button" class="mui-btn mui-btn-gray">发送</button>
 		</div>
 		
@@ -71,7 +72,7 @@
 				friend = JSON.parse(curView.friendJson);
 				
 				// 标题栏
-				document.getElementById("title").innerHTML = friend.username; // 备注名功能之后再完善
+				document.getElementById("title").innerText = friend.username; // 备注名功能之后再完善
 				
 				// 初始化聊天记录，并渲染到页面上
 				initChatHistory();
@@ -98,8 +99,7 @@
 				var content = document.getElementById("content");
 				var send = document.getElementById("send");
 				content.addEventListener("input", function() { // 监听输入
-					// console.log(content.value);
-					if(content.value.trim().length > 0) {
+					if(content.innerText.trim().length > 0) {
 						send.setAttribute("class", "mui-btn mui-btn-green");
 						send.removeAttribute("disabled");
 					} else {
@@ -118,9 +118,9 @@
 					if (networkType == 0 || networkType == 1) {
 						return app.showToast("未连接网络");
 					}
-					sendMsg(content.value); 
+					sendMsg(content.innerText); 
 					
-					content.value = ""; 
+					content.innerText = ""; 
 					// 不设置按钮禁用，会遇到：软键盘被收起的问题
 					send.setAttribute("class", "mui-btn mui-btn-gray");
 					send.setAttribute("disabled", "disabled");
@@ -148,6 +148,11 @@
 			}
 			
 			function sendMsg(msg) {
+				// 1、转义处理，2、换行符替换
+				msg = app.htmlEscape(msg);
+				var reg = new RegExp("\r|\n|\r\n"); 
+				msg = msg.replace(reg, "<br/>");
+				
 				var msgList = document.getElementById("msgList");
 				var msgHtml = "<div class='me-msg'><div class='content-box'><p>" + msg + "</p></div><img src='" + me.faceImage + "'></div>";
 				msgList.insertAdjacentHTML("beforeend", msgHtml);

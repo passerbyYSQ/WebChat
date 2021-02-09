@@ -88,12 +88,12 @@
 				initIndexdList();
 			});
 			mui.plusReady(function () { // 注意plusReady在页面声明周期只有一次，而show有多次
-				var contactList = app.getContactList();
+				// var contactList = app.getContactList();
 				// 关于新增和删除好友，还要面临缓存更新问题。这个留到netty之后再解决
-				if (!app.isNotNull(contactList)) { // 本地没有缓存数据
+				// if (!app.isNotNull(contactList)) { // 本地没有缓存数据
 					// 由于ajax里面用到了plus取缓存，所以需要放在plusReady里面
-					fetchContactList(); // 请求后台拿取数据并且缓存到本地
-				}
+					fetchContactList(); // 请求后台拿取数据并且更新缓存
+				// }
 				
 				// 上面的操作已经确保本地一定会有数据，那么对webview的show事件添加监听
 				var curView = plus.webview.currentWebview();

@@ -138,7 +138,7 @@ public class UserController {
      * 修改用户名
      */
     @PostMapping("username")
-    public ResultModel updateUsername(@NotBlank @Length(min = 2, max = 32) String username,
+    public ResultModel updateUsername(@NotBlank @Length(min = 2, max = 20) String username,
                                       HttpServletRequest request) {
         User user = userService.getUserByUsername(username);
         if (!ObjectUtils.isEmpty(user)) {

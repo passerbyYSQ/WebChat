@@ -34,8 +34,8 @@ public class HeartBeatHandler extends ChannelInboundHandlerAdapter {
 
             } else if (event.state() == IdleState.ALL_IDLE) {
                 UserChannelRepository.remove(channel);
-                logger.info("channel进入写读写空闲状态：{}，剩余通道个数：{}",
-                        channelId, UserChannelRepository.CHANNEL_GROUP.size());
+//                logger.info("channel进入写读写空闲状态：{}，剩余通道个数：{}",
+//                        channelId, UserChannelRepository.CHANNEL_GROUP.size());
 //                UserChannelRepository.print();
             }
         }

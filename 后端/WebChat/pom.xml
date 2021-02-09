@@ -28,6 +28,8 @@
 		<zxing.version>3.3.3</zxing.version>
 		<pagehelper.version>1.2.13</pagehelper.version>
 		<netty.version>4.1.50.Final</netty.version>
+		<mica.version>2.4.1-GA</mica.version>
+<!--		<mica.css.version></mica.css.version>-->
 	</properties>
 
 	<dependencies>
@@ -35,6 +37,20 @@
 <!--			<groupId>org.springframework.boot</groupId>-->
 <!--			<artifactId>spring-boot-starter-thymeleaf</artifactId>-->
 <!--		</dependency>-->
+
+		<!-- 防xss
+			https://gitee.com/596392912/mica/tree/master/mica-xss -->
+		<dependency>
+			<groupId>net.dreamlu</groupId>
+			<artifactId>mica-xss</artifactId>
+			<version>${mica.version}</version>
+		</dependency>
+		<!--	必须要依赖核心包	-->
+		<dependency>
+			<groupId>net.dreamlu</groupId>
+			<artifactId>mica-core</artifactId>
+			<version>${mica.version}</version>
+		</dependency>
 
 		<!-- 用户controller层中vo对象的参数校验，不通过会抛出异常。通过全局异常配置进行
         统一捕获返回给前端 -->

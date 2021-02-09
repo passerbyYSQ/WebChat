@@ -40,7 +40,8 @@ public class ChatMsgServiceImpl implements ChatMsgService {
         record.setId(sid.nextShort()); // 消息的主键id
         record.setSendUserId(senderId);
         record.setAcceptUserId(req.getReceiverId());
-        record.setMsg(req.getContent()); // 消息内容
+        String content = req.getContent().replaceAll("(\\r|\\n|\\r\\n)", "<br/>");
+        record.setMsg(content); // 消息内容
         record.setCreateTime(LocalDateTime.now());
         record.setSignFlag(MsgSignFlagEnum.UNSIGNED.type); // 状态为[未签收]
         chatMsgMapper.insert(record);

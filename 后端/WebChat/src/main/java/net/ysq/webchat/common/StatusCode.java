@@ -32,7 +32,7 @@ public enum StatusCode {
 
     // 账户相关
     TOKEN_IS_MISSING(6200, "token缺失"),
-    FORCED_OFFLINE(6201, "异地登录，当前账户被迫下线"),
+    FORCED_OFFLINE(6201, "异地登录，当前账户被迫下线，请重新登录"),
     TOKEN_IS_EXPIRED(6202, "token已过期"),
     TOKEN_IS_INVALID(6203, "无效token"),
 

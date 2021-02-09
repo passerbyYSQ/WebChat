@@ -48,11 +48,7 @@ spring:
   mvc:
     format:
       date-time: yyyy-MM-dd HH:mm:ss
-    jackson:
-      date-format: yyyy-MM-dd HH:mm:ss
-      # GMT就是格林威治标bai准时间的英文缩写(GreenwichMeanTime格林尼治标准时间)
-      # GMT+8是东八区的意思，其时间比du格林zhi威治时间早8个小dao时
-      time-zone: GMT+8
+
   servlet:
     multipart:
       enabled: true   # 默认为 true 即允许附件上传
@@ -74,6 +70,17 @@ spring:
         max-wait: -1    # 连接池阻塞的最大的等待时间。-1表示一直等待
         max-idle: 20    # 连接池空闲连接的最大数量
         min-idle: 3     # 连接池空闲连接的最小数量
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    # GMT就是格林威治标bai准时间的英文缩写(GreenwichMeanTime格林尼治标准时间)
+    # GMT+8是东八区的意思，其时间比du格林zhi威治时间早8个小dao时
+    time-zone: GMT+8
+    parser:
+      #允许出现特殊字符和转义符
+      allow_unquoted_control_chars: true
+      #允许出现单引号
+      allow_single_quotes: true
+
 mybatis:
   # xxMapper.xml文件在resources/mybatis/mapper下
   mapper-locations: classpath:mybatis/mapper/*.xml
@@ -91,4 +98,11 @@ pagehelper:
   #  params: =count=countSql
   reasonable: true
   support-methods-arguments: true
+
+mica:
+  xss:
+    enabled: true
+    path-patterns: /**
+#    trim-text: true
+#    enable-escape: true
 

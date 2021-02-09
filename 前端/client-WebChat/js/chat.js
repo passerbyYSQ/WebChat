@@ -110,7 +110,7 @@ window.CHAT = {
 		var msgModel = new app.MsgModel(app.action.KEEP_ALIVE, null);
 		// 发送心跳包
 		return setInterval(function() {
-			CHAT.send(JSON.stringify(msgModel));
+			CHAT.socket.send(JSON.stringify(msgModel));
 			// console.log("已发送心跳包：" + new Date());
 		}, 10000); // 每隔10秒（必须小与后端定义的超时时间）发送一个心跳包
 		

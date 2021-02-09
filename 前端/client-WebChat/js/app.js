@@ -6,14 +6,14 @@ window.app = {
 	/**
 	 * netty服务后端发布的url地址
 	 */
-	nettyServerUrl: 'ws://192.168.1.4:8081/ws',
+	nettyServerUrl: 'ws://192.168.0.107:8081/ws',
 	
 	/**
 	 * 后端服务发布的url地址
 	 * 开发时，服务端和测试手机需要在同一局域网。此处的ip是服务端所在电脑的局域网ip
 	 * 由于是动态分配，所以ip可能会变
 	 */
-	serverUrl: "http://192.168.1.4:8080/v1/api/",  
+	serverUrl: "http://192.168.0.107:8080/v1/api/",  
 	
 	/**
 	 * 判断字符串是否为空
@@ -97,6 +97,21 @@ window.app = {
 		}else if (d_days >= 30) {
 		    return Y + '-' + M + '-' + D + ' ' + H + ':' + m;
 		}
+	},
+	
+	/**
+	 * 用浏览器内部转换器实现html转码器实现html标签转义
+	 */
+	htmlEscape: function(html) {
+		//1.首先动态创建一个容器标签元素，如DIV
+		var temp = document.createElement ("div");
+		//2.然后将要转换的字符串设置为这个元素的innerText(ie支持)或者textContent(火狐，google支持)
+		(temp.textContent != undefined ) ? (temp.textContent = html) : (temp.innerText = html);
+		
+		//3.最后返回这个元素的innerHTML，即得到经过HTML编码转换的字符串了
+		var output = temp.innerHTML;
+		temp = null;
+		return output;
 	},
 	
 	/**
@@ -195,6 +210,9 @@ window.app = {
 				onDisconnected();
 			} else {
 				app.showToast("已连接网络", "success");
+				// 网络重连上之后，重新打开websocket
+				var chatListView = plus.webview.getWebviewById("chat_list");
+				chatListView.evalJS("CHAT.init()");
 			}
 		});
 	},

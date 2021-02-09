@@ -65,24 +65,32 @@ html, body {
 .footer {
 	/* 不会随着滚动条滚动 */
 	position: fixed; 
-	height: 50px;
-	/* max-height: 88px; */
+	height: auto;
 	width: 100%;
 	border-top: solid 1px #bbb;
 	left: 0;
 	bottom: 0;
 	background-color: #fafafa;
 	padding: 6px 24px;
-	display: flex;
+	display: flex; 
 	justify-content: space-between;
 }
-.footer textarea {
-	height: 100%;
-	padding: 4px 8px;
-	line-height: 28px;
-	margin-right: 8px;
-}
 .footer button {
-	height: 37px;
+	max-height: 37px;
 	font-size: 18px;
+	margin-left: 12px;
+}
+.editable {
+	/* 弹性布局下，宽度百分百意味意味占满剩下的空间 */
+	width: 100%;
+	/* 初始高度由line-height和padding撑开 */
+	height: auto;
+	max-height: 68px;
+	overflow-y: scroll;
+	padding: 4px 8px;
+	line-height: 24px;
+	border-radius: 3px;
+	border: solid 1px #d3d3d3;
+	background-color: white;
+	font-size: 16px;
 }
