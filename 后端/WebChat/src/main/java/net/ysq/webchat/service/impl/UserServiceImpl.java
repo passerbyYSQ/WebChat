@@ -113,17 +113,20 @@ public class UserServiceImpl implements UserService {
         // 对密码进行md5加密
         String md5Pwd = DigestUtils.md5DigestAsHex(vo.getPassword().getBytes());
         String userId = sid.nextShort();
-
+        String defaultPhoto = "https://webchat-ysq.oss-cn-shenzhen.aliyuncs.com/public/face-cat.jpg?x-oss-process=style/face_img";
         // 二维码
-        String qrCodeUrl = generateAndUploadQRCode(userId, null, userId);
+        String qrCodeUrl = generateAndUploadQRCode(userId, defaultPhoto, userId);
 
         User user = new User();
         user.setId(userId);
         user.setPhone(vo.getPhone());
         user.setUsername(userId); // 将userId作为初始化的username
+        user.setFaceImageBig(defaultPhoto);
+        user.setFaceImage(defaultPhoto);
         user.setPassword(md5Pwd);
         user.setCid(vo.getCid());
         user.setSex((byte) 3); // 性别：保密
+
         user.setQrcode(qrCodeUrl); // 二维码
 
         int cnt = userMapper.insertSelective(user);

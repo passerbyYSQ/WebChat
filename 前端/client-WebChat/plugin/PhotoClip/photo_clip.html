@@ -95,13 +95,19 @@
 								user.faceImage = res.data.faceImage;
 								user.faceImageBig = res.data.faceImageBig;
 								user.qrcode = res.data.qrcode;
+								// 更新个人缓存
 								app.setUserGlobalInfo(user);
+								
+								var meView = plus.webview.getWebviewById("me");
+								meView.evalJS("refreshUserInfo()");
+								mui.openWindow("index.html", "index");
+								
 								// 刷新页面，有问题
 								// var faceImgView = plus.webview.getWebviewById("face_img");
 								// var meView = plus.webview.getWebviewById("me");
 								// mui.fire(faceImgView, "refresh");
 								// mui.fire(meView, "refresh");
-								mui.back();
+								//mui.back();
 								// curWebView.close();
 							}, "post");
 			    		},

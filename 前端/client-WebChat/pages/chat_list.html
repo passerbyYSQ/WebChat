@@ -46,6 +46,7 @@
 				top: 7px;
 			}
 			
+			/* 删除快照的滑块 */
 			.mui-slider-right {
 				padding-bottom: 1px;
 			}
@@ -57,13 +58,12 @@
 		</header>
 		
 		<div class="mui-content">
-			<!-- <ul id="list" class="mui-table-view"> 
-				<li class="mui-table-view-cell mui-collapse">
+			<ul id="friendRequestList" class="mui-table-view"> 
+				<!-- <li class="mui-table-view-cell mui-collapse">
 					<a class="mui-navigate-right" href="#">
 						<img class="mui-media-object mui-pull-left" src="../imgs/face-cat.jpg">
 						<div class="mui-media-body">
 							<span>王小明王</span>
-							<span class='mui-badge mui-badge-warning' style="padding: 2px 6px;">new</span>
 							<p class="mui-pull-right">3秒前</p>
 							<p class="mui-ellipsis"><b>[ 状态 ]</b> 向你发来了一个好友请求</p>
 						</div>
@@ -78,11 +78,11 @@
 							<button type="button" class="mui-btn mui-btn-green">同意</button>
 						</div>
 					</div>
-				</li>
-			</ul> -->
+				</li> -->
+			</ul>
 			
 			<ul id="chatSnapshotList" class="mui-table-view">
-				<li class="mui-table-view-cell mui-media">
+				<!-- <li class="mui-table-view-cell mui-media">
 					<div class="mui-slider-right mui-disabled">
 						<button class="mui-btn mui-btn-red">删除</button>
 					</div>
@@ -96,7 +96,7 @@
 							<p class="mui-ellipsis">能和心爱的人一起睡觉，是件幸福的事情；可是，打呼噜怎么办？</p>
 						</div>
 					</a>
-				</li>
+				</li> -->
 			</ul>
 		</div>
 
@@ -109,7 +109,8 @@
 			mui.init();
 			
 			mui.plusReady(function () {
-				// loadRequestList();
+				// 加载好友申请列表。最新的10条
+				loadRequestList();
 				// 注意不要在这里绑定按钮的点击事件，因为loadRequestList()是异步的
 				
 				// websocket初始化
@@ -127,6 +128,7 @@
 				for(var i=0; i<chatSnapshotList.length; i++) {
 					var chatSnapshot = chatSnapshotList[i];
 					console.log(JSON.stringify(chatSnapshot));
+					// 从联系人列表缓存拿到好友的相关数据（头像、用户名等、备注名）
 					var friend = app.getFriendFromContactList(chatSnapshot.friendId);
 					var friendJson = JSON.stringify(friend);
 					var redPoint = "";
@@ -175,12 +177,15 @@
 			
 			// 更新快照列表
 			function updateChatSnapshot(friendId, msg, isRead, timestamp) { // 最后一条消息
-				
-				var oldLi = document.getElementById("ChatSnapshot_" + friendId);
+				var friend = app.getFriendFromContactList(friendId);
+				doUpdateChatSnapshot(friend, msg, isRead, timestamp);
+			}
+			
+			function doUpdateChatSnapshot(friend, msg, isRead, timestamp) {
+				var oldLi = document.getElementById("ChatSnapshot_" + friend.userId);
 				if (app.isNotNull(oldLi)) {
 					oldLi.remove();
 				}
-				var friend = app.getFriendFromContactList(friendId);
 				var friendJson = JSON.stringify(friend);
 				// 在头部插入新快照
 				var chatSnapshotBox = document.getElementById("chatSnapshotList"); 
@@ -220,8 +225,14 @@
 					requestId: requestId,
 					status: status
 				}, function(res) {
-					loadRequestList(); // 重新加载列表
-				}, "post", null, function(res) {
+					loadRequestList(); // 重新加载好友申请列表
+					// 更新联系人列表、新建快照
+					var friendId = res.data;
+					console.log("成为好友成功：" + friendId);
+					var chatListView = plus.webview.getWebviewById("chat_list");
+					chatListView.evalJS("CHAT.pullFriend('" + friendId + "')");
+					
+				}, "post", null, function(res) { // 业务失败。对方已同意，导致自己无法处理
 					app.showToast(res.msg, "error");
 					loadRequestList(); // 重新加载列表
 				});
@@ -233,20 +244,19 @@
 				var html = "";
 				for(var i=0; i<list.length; i++) {
 					var btnsHtml = "";
-					var remind ="";
 					if (list[i].status == 0) { // 尚未处理。需要显示操作按钮
-						remind = " <span class='mui-badge mui-badge-warning' style='padding: 2px 6px;'>new</span>";
 						btnsHtml = "<div class='btn-group'>" +
 										"<button type='button' rid='"+ list[i].id +"' status='3' class='mui-btn mui-btn-danger'>拒绝</button>" +
 										"<button type='button' rid='"+ list[i].id +"' status='2' class='mui-btn mui-btn-grey'>忽略</button>" +
 										"<button type='button' rid='"+ list[i].id +"' status='1' class='mui-btn mui-btn-green'>同意</button></div>";					
 					}
+					var formated = app.formatDate(app.getDateTimeStamp(list[i].requestTime));
 					html += ("<li class='mui-table-view-cell mui-collapse'>" +
 								"<a class='mui-navigate-right' href='#'>" +
 									"<img class='mui-media-object mui-pull-left' src='" + list[i].senderFaceImg + "'>" +
 									"<div class='mui-media-body'>" +
-										"<span>" + list[i].senderUsername + "</span>" + remind +
-										"<p class='mui-pull-right'>" + app.formatDate(list[i].requestTime) + "</p>" +
+										"<div class='title'><span class='mui-ellipsis'>" + list[i].senderUsername + "</span>" + 
+										"<p style='margin-right:24px;'>" + formated + "</p></div>" +
 										"<p class='mui-ellipsis'><b>[ " + status[list[i].status] + " ]</b> 向你发来了一个好友请求</p></div></a>" + 
 										 "<div class='mui-collapse-content'>" +
 											"<p>" + list[i].content + "</p>" +
@@ -254,7 +264,7 @@
 							
 				}
 				
-				var list = document.getElementById("list");
+				var list = document.getElementById("friendRequestList");
 				list.innerHTML = html;
 			}
 			

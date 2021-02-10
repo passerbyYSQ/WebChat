@@ -189,10 +189,19 @@
 			}
 			
 			// 请求服务端获取好友列表数据
-			function fetchContactList() {
+			function fetchContactList(newFriendId) {
 				console.log("请求后端拿取好友列表--");
 				app.ajax("friend/list", {}, function(res) {
 					app.setContactList(res.data);
+					if (app.isNotNull(newFriendId)) {
+						var timestamp = new Date().getTime();
+						var me = app.getUserGlobalInfo();
+						var content = "我们已经成为好友";
+						app.saveUserChatSnapshot(me.id, newFriendId, content, false, timestamp); 
+						// 新添加的好友的快照
+						var chatListView = plus.webview.getWebviewById("chat_list");
+						chatListView.evalJS("updateChatSnapshot('" + newFriendId + "', '" + content +"', " + false + ", " + timestamp + ")");
+					}
 				}, "get");
 			}
 			

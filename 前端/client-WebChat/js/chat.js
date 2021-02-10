@@ -48,14 +48,7 @@ window.CHAT = {
 		var me = app.getUserGlobalInfo();
 		
 		if (action == app.action.PULL_FRIEND) { // 拉取好友
-			var contactView = plus.webview.getWebviewById("contact");
-			// 更新好友列表
-			// 1、更新本地缓存，使缓存最新。下次打开，缓存不为空，直接从缓存中。由于保证了缓存最新，所以数据是正确的
-			contactView.evalJS("fetchContactList()"); // 从后台拿到最新数据，并重新[全部]覆盖缓存
-			// 2、界面更新。由于局部更新太麻烦了，这里重新构建并刷新html
-			contactView.evalJS("showContactList()");
-			// 3、更新好友申请列表
-			// 关于好友请求结合Websocket的优化，放在聊天之后再做
+			CHAT.pullFriend(msgModel.data);
 			
 		} else if (action == app.action.CHAT) { // 聊天类型的消息
 			var msgList = msgModel.data;
@@ -92,9 +85,14 @@ window.CHAT = {
 				var timestamp = app.getDateTimeStamp(lastMsg.time);
 				app.saveUserChatSnapshot(myId, lastMsg.senderId, lastMsg.content, isRead, timestamp); // 我发送的消息，对于我来说，肯定是已读的
 				chatListView.evalJS("updateChatSnapshot('" + lastMsg.senderId + "', '" 
-				+ lastMsg.content +"', " + isRead + ", '" + timestamp + "')");
+					+ lastMsg.content +"', " + isRead + ", " + timestamp + ")");
 			}
-		}
+		
+		} else if (action == app.action.FRIEND_REQUEST) {
+			// 有新的好友申请
+			var chatListView = plus.webview.getWebviewById("chat_list");
+			chatListView.evalJS("loadRequestList()");
+		} 
 	},
 	wsclose: function() {
 		console.log("连接已关闭");
@@ -113,6 +111,17 @@ window.CHAT = {
 			CHAT.socket.send(JSON.stringify(msgModel));
 			// console.log("已发送心跳包：" + new Date());
 		}, 10000); // 每隔10秒（必须小与后端定义的超时时间）发送一个心跳包
+		
+	},
+	pullFriend: function(friendId) {
+		var me = app.getUserGlobalInfo();
+		var contactView = plus.webview.getWebviewById("contact");
+		// 更新好友列表
+		// 1、更新本地缓存，使缓存最新。下次打开，缓存不为空，直接从缓存中。由于保证了缓存最新，所以数据是正确的
+		contactView.evalJS("fetchContactList('" + friendId + "')"); // 从后台拿到最新数据，并重新[全部]覆盖缓存
+		// 2、界面更新。由于局部更新太麻烦了，这里重新构建并刷新html
+		contactView.evalJS("showContactList()");
+		// 3、插入一条空的快照。需要在更新本地缓存之后。但是更新本地缓存是个异步操作，故不能写在这里
 		
 	}
 };

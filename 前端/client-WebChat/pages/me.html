@@ -152,10 +152,11 @@
 				document.getElementById("username").innerHTML = user.username;
 				// console.log(user.qrcode);
 				if (app.isNotBlank(user.faceImage)) {
-					document.getElementById("faceImage").src = user.faceImage; // 阿里oss
+					document.getElementById("faceImage").src = user.faceImage + "&rand=" + Math.random(); // 阿里oss
 				}
 				if (app.isNotBlank(user.qrcode)) {
-					document.getElementById("qrcode").src = user.qrcode;
+					document.getElementById("qrcode").src = user.qrcode + "?rand=" + Math.random();
+					console.log(document.getElementById("qrcode").src);
 				}
 			}
 		</script>

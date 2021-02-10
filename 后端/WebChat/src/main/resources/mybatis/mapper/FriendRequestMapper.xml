@@ -13,18 +13,19 @@
     <result column="request_date_time" jdbcType="TIMESTAMP" property="requestDateTime" />
   </resultMap>
 
-<!-- 在yml中配置了扫描的包路径是po包下，而FriendRequestCard在vo包下，所以需要写全路径  -->
+    <!-- 在yml中配置了扫描的包路径是po包下，而FriendRequestCard在vo包下，所以需要写全路径  -->
   <select id="getFriendRequestList" parameterType="String" resultType="net.ysq.webchat.vo.FriendRequestCard">
         select
             r.id,
             r.content,
             r.status,
             r.request_date_time requestTime,
+            u.id senderId,
             u.username senderUsername,
             u.face_image senderFaceImg
         from friend_request r
         left join user u on r.send_user_id=u.id
-        where r.accept_user_id=#{receiverId}
+        where r.accept_user_id=#{receiverId} and status=0
         order by request_date_time desc
   </select>
 

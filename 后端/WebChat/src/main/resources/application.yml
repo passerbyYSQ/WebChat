@@ -1,4 +1,5 @@
 server:
+  # 在使用外部tomcat运行项目时，该配置无效。也可以不需要移除
   port: 8080
   servlet:
     context-path: /v1/api/
@@ -85,7 +86,7 @@ mybatis:
   # xxMapper.xml文件在resources/mybatis/mapper下
   mapper-locations: classpath:mybatis/mapper/*.xml
   # 与数据库表对应的po类所在的包，配置之后可以直接在xml中写类命
-  type-aliases-package: net.ysq.webchat.po
+  type-aliases-package: net.ysq.webchat
   configuration:
     # 将数据库表的带下划线字段转成java中的驼峰命名
     map-underscore-to-camel-case: true

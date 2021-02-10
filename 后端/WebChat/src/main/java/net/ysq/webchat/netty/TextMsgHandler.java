@@ -71,7 +71,7 @@ public class TextMsgHandler extends SimpleChannelInboundHandler<TextWebSocketFra
                 UserChannelRepository.bind(userId, channel);
                 // 查询是否有未签收的消息，如果有，就一次性全部推送（并不是逐条推送）
                 List<SingleChatMsgResponse> unsignedMsgList = chatMsgService.getUnsignedMsg(userId);
-                if (unsignedMsgList.size() > 0) {
+                if (unsignedMsgList.size() > 0) { // 不为空才推送
                     MsgModel<List<SingleChatMsgResponse>> model = new MsgModel<>();
                     model.setAction(MsgActionEnum.CHAT.type);
                     model.setData(unsignedMsgList);
@@ -89,19 +89,21 @@ public class TextMsgHandler extends SimpleChannelInboundHandler<TextWebSocketFra
 
             // 对于聊天消息，channel所绑定的user是发送者
             String senderId = UserChannelRepository.getUserId(channel);
+            // 如果是空的，说明绑定失败了（可能是token过期了）。不做处理
+            if (!StringUtils.isEmpty(senderId)) {
+                // 往消息表插入数据
+                ChatMsg chatMsg = chatMsgService.saveMsg(senderId, data);
 
-            // 往消息表插入数据
-            ChatMsg chatMsg = chatMsgService.saveMsg(senderId, data);
+                // 构建消息实体
+                MsgModel<List<SingleChatMsgResponse>> model = new MsgModel<>();
+                model.setAction(MsgActionEnum.CHAT.type);
+                List<SingleChatMsgResponse> unsignedMsgList = new ArrayList<>();
+                unsignedMsgList.add(new SingleChatMsgResponse(chatMsg));
+                model.setData(unsignedMsgList);
 
-            // 构建消息实体
-            MsgModel<List<SingleChatMsgResponse>> model = new MsgModel<>();
-            model.setAction(MsgActionEnum.CHAT.type);
-            List<SingleChatMsgResponse> unsignedMsgList = new ArrayList<>();
-            unsignedMsgList.add(new SingleChatMsgResponse(chatMsg));
-            model.setData(unsignedMsgList);
-
-            // 推送消息
-            UserChannelRepository.pushMsg(data.getReceiverId(), model);
+                // 推送消息
+                UserChannelRepository.pushMsg(data.getReceiverId(), model);
+            }
 
         } else if (action.equals(MsgActionEnum.SIGNED.type)) {
             // 3、签收消息的类型。针对具体的消息进行签收，修改数据库对应的消息状态为[已签收]

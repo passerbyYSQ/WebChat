@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 public class FriendRequestCard {
 
     private String id; // 申请的id
+    private String senderId; // 发送者的用户id
     private String senderUsername; // 发送者的用户名
     private String senderFaceImg;  // 发送者的头像
     private String content; // 备注内容
@@ -23,6 +24,14 @@ public class FriendRequestCard {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getSenderId() {
+        return senderId;
+    }
+
+    public void setSenderId(String senderId) {
+        this.senderId = senderId;
     }
 
     public String getSenderUsername() {

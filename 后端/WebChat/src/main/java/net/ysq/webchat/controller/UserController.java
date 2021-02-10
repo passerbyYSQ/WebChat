@@ -74,6 +74,7 @@ public class UserController {
                 .filter((user) -> !user.getId().equals(myId)) // 将自己排除掉。true表示保留
                 .map(UserCard::new)
                 .collect(Collectors.toList());
+
         return ResultModel.success(userCards);
     }
 

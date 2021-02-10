@@ -52,7 +52,7 @@ public class FriendRequestController {
      * 处理我收到的好友申请
      */
     @PostMapping("process")
-    public ResultModel updateRequestStatus(@NotBlank String requestId, @Range(min = 0, max = 3) byte status,
+    public ResultModel<String> updateRequestStatus(@NotBlank String requestId, @Range(min = 0, max = 3) byte status,
                                            HttpServletRequest request) {
         // requestId合法性检查
         FriendRequest friendRequest = friendRequestService.getOneFriendRequest(requestId);
@@ -75,27 +75,28 @@ public class FriendRequestController {
         // 情景：都发送了申请，一方同意之后，另一方又同意
         // A发给B（申请为p1），B也发给了A（p2）。B先同意了（p1）。后来A又同意（p2）
         // 这个时候我们需要给A提示说，你们已经是好友了。同时帮A将那条无法处理的申请的状态改为同意
-        MyFriend friend = friendService.getMyOneFriend(myId, friendRequest.getSendUserId());
+        String senderId = friendRequest.getSendUserId();
+        MyFriend friend = friendService.getMyOneFriend(myId, senderId);
         if (!ObjectUtils.isEmpty(friend)) {
             friendRequestService.updateRequestStatus(requestId, (byte) 1);
             return ResultModel.failed(StatusCode.HAVE_BEEN_FRIEND);
         }
 
         // 修改数据库记录。如果是同意，还需要往好友列表插入一条数据
-        friendRequestService.agreeFriendRequest(requestId, status, myId, friendRequest.getSendUserId());
+        friendRequestService.agreeFriendRequest(requestId, status, myId, senderId);
 
         // 0：尚未处理；1：同意；2：忽略；3：拒绝
         // netty推送
-        // 如果是忽略，则不推送；如果是同意或者拒绝，则推送
-
-        if (status == 1) { // 同意，推送通知，更新好友列表
-            MsgModel model = new MsgModel();
+        // 如果是忽略或者拒绝，则不推送；如果是同意，则推送通知
+        if (status == 1) {
+            MsgModel<String> model = new MsgModel<>();
             model.setAction(MsgActionEnum.PULL_FRIEND.type);
-            // 我处理请求，说明我是这条申请的接收者
-            UserChannelRepository.pushMsg(friendRequest.getSendUserId(), model);
+            model.setData(myId); // 把我的id推给发送者
+            // 我处理请求，说明我是这条申请的接收者。需要推送给申请的发送者
+            UserChannelRepository.pushMsg(senderId, model);
         }
 
-        return ResultModel.success();
+        return ResultModel.success(senderId);  // 返回给我发送者的id
     }
 
     /**

@@ -11,6 +11,7 @@
 	<groupId>net.ysq</groupId>
 	<artifactId>webchat</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<!-- 打包方式为war包	-->
 	<packaging>war</packaging>
 	<name>WebChat</name>
 	<description>Demo project for Spring Boot</description>
@@ -20,7 +21,7 @@
 
 		<!--	使用1.1.10，lastSendRequestTime会报错java.sql.SQLFeatureNotSupportedException: null
 			https://blog.csdn.net/sinat_14977855/article/details/104042952-->
-		<druid.version>1.1.21</druid.version>
+		<druid.version>1.1.20</druid.version>
 		<mybatis.version>2.1.4</mybatis.version>
 		<tk-mapper.version>2.1.5</tk-mapper.version>
 		<jwt.version>3.3.0</jwt.version>
@@ -62,6 +63,12 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+<!--			<exclusions>-->
+<!--				<exclusion>-->
+<!--					<groupId>org.springframework.boot</groupId>-->
+<!--					<artifactId>spring-boot-starter-tomcat</artifactId>-->
+<!--				</exclusion>-->
+<!--			</exclusions>-->
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/io.netty/netty-all -->
@@ -136,12 +143,24 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- 内嵌tomcat，打包时候不会放进去 -->
+		<!--
+		spring-boot-starter-web 中有spring-boot-starter-tomcat的依赖，而且作用域是scope
+		而本pom.xml文件中，也引入了spring-boot-starter-tomcat的依赖，而作用域是provided
+		根据maven的覆盖优先原则原则，所以父pom的tomcat依赖失效了，而本pom的tomcat依赖有效
+		而provided的作用域，打包时候不会放进去。
+		https://blog.csdn.net/weixin_34070493/article/details/111966492
+		内嵌tomcat，打包时候不会放进去，而是由外部的tomcat来提供 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-tomcat</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -158,9 +177,17 @@
 
 	<build>
 		<plugins>
+			<!--  用于打包的插件	-->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						<goals>-->
+<!--							<goal>repackage</goal>-->
+<!--						</goals>-->
+<!--					</execution>-->
+<!--				</executions>-->
 			</plugin>
             <!--
                 mybatis逆向工程插件

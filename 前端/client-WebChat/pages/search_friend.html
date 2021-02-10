@@ -10,8 +10,11 @@
 		<link href="../css/common.css" rel="stylesheet" />
 		
 		<style type="text/css">
-			.mui-scroll-wrapper {
-				top: 89px;
+			#userList {
+				height: 100%;
+				overflow: auto;
+				/* 可滚动 */
+				-webkit-overflow-scrolling: touch; 
 			}
 			.add-btn {
 				padding: 4px 8px;
@@ -39,22 +42,19 @@
 			</div>
 		</div>
 		
-		<div class="mui-scroll-wrapper">
-			<div class="mui-scroll">
-				<ul id="userList"  class="mui-table-view">
-					<!-- <li class="mui-table-view-cell mui-media">
-						<a href="javascript:;">
-							<img class="mui-media-object mui-pull-left" src="../imgs/face-cat.jpg">
-							<div class="mui-media-body">
-								标题
-								<p class="mui-ellipsis">能和心爱的人一起睡觉，是件幸福的事情；可是，打呼噜怎么办？</p>
-							</div>
-							
-						</a>
-					</li> -->
-				</ul>
-			</div>
-		</div>
+		
+		<ul id="userList"  class="mui-table-view">
+			<!-- <li class="mui-table-view-cell mui-media">
+				<a href="javascript:;">
+					<img class="mui-media-object mui-pull-left" src="../imgs/face-cat.jpg">
+					<div class="mui-media-body">
+						标题
+						<p class="mui-ellipsis">能和心爱的人一起睡觉，是件幸福的事情；可是，打呼噜怎么办？</p>
+					</div>
+					
+				</a>
+			</li> -->
+		</ul>
 		
 		<script src="../js/mui.min.js"></script>
 		<script src="../js/app.js"></script>
