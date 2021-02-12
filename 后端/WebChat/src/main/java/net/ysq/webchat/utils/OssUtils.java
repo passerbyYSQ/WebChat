@@ -46,10 +46,11 @@ public class OssUtils {
         String original = DOMAIN_NAME + objectName; // 原图
         String thumb = original + "?x-oss-process=style/face_img"; // 缩略图
 
+        String timestamp = "timestamp=" + System.currentTimeMillis();
         User user = new User();
         user.setId(userId);
-        user.setFaceImageBig(original);
-        user.setFaceImage(thumb);
+        user.setFaceImageBig(original + "?" + timestamp);
+        user.setFaceImage(thumb + "&" + timestamp);
 
         return user;
     }

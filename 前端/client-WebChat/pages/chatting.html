@@ -161,7 +161,7 @@
 				scrollToBottom();
 				// netty 推送
 				
-				// 构建消息实体
+				// 构建消息实体。发送的时候，是处理的msg
 				var msgModel = new app.MsgModel(app.action.CHAT, {
 					receiverId: friend.userId,
 					content: msg
@@ -171,13 +171,13 @@
 				
 				var timestamp = new Date().getTime();
 				// 将聊天记录保存到本地缓存
-				app.saveUserChatHistory(me.id, friend.userId, msg, 1); // 1：我发送的
+				app.saveUserChatHistory(me.id, friend.userId, escapedMsg, 1); // 1：我发送的
 				// 更新聊天快照的本地缓存
-				app.saveUserChatSnapshot(me.id, friend.userId, msg, true, timestamp); // 我发送的消息，对于我来说，肯定是已读的
+				app.saveUserChatSnapshot(me.id, friend.userId, escapedMsg, true, timestamp); // 我发送的消息，对于我来说，肯定是已读的
 				
 				// 更新快照列表
 				var chatListView = plus.webview.getWebviewById("chat_list");
-				chatListView.evalJS("updateChatSnapshot('" + friend.userId + "', '" + msg +"', true, '" + timestamp + "')");
+				chatListView.evalJS("updateChatSnapshot('" + friend.userId + "', '" + escapedMsg +"', true, '" + timestamp + "')");
 			}
 			
 			function receiveMsg(msg) {

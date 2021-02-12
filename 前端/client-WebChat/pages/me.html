@@ -115,6 +115,8 @@
 							// 刷新页面。有问题，老师尚未jie解决！！！
 							user.username = val;
 							app.setUserGlobalInfo(user);
+							
+							refreshUserInfo();
 							// mui.fire(curWebview, "refresh");
 						}, "post");
 					});
@@ -152,10 +154,10 @@
 				document.getElementById("username").innerHTML = user.username;
 				// console.log(user.qrcode);
 				if (app.isNotBlank(user.faceImage)) {
-					document.getElementById("faceImage").src = user.faceImage + "&rand=" + Math.random(); // 阿里oss
+					document.getElementById("faceImage").src = user.faceImage; // 阿里oss
 				}
 				if (app.isNotBlank(user.qrcode)) {
-					document.getElementById("qrcode").src = user.qrcode + "?rand=" + Math.random();
+					document.getElementById("qrcode").src = user.qrcode;
 					console.log(document.getElementById("qrcode").src);
 				}
 			}

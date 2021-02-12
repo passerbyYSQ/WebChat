@@ -68,7 +68,8 @@ public class UserServiceImpl implements UserService {
 
         // 更新oss中的二维码
         String qrCodeUrl = generateAndUploadQRCode(userId, user.getFaceImageBig(), userId);
-        user.setQrcode(qrCodeUrl);
+        String timestamp = "timestamp=" + System.currentTimeMillis();
+        user.setQrcode(qrCodeUrl + "?" + timestamp);
 
         // 根据userId更新数据库记录
         updateUserById(user);
