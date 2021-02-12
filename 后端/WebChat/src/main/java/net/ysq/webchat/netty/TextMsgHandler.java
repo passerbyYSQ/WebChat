@@ -33,14 +33,19 @@ import java.util.List;
 public class TextMsgHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final static ChatMsgService chatMsgService;
+    private final static RedisUtils redisUtils;
+    private final static ObjectMapper objectMapper;
+
+    static {
+        chatMsgService = (ChatMsgService) SpringUtils.getBean("chatMsgServiceImpl");
+        redisUtils = (RedisUtils) SpringUtils.getBean("redisUtils");
+        objectMapper = SpringUtils.getBean(ObjectMapper.class);
+    }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {
         logger.info("接收到的文本消息：{}", msg.text());
-
-        ChatMsgService chatMsgService = (ChatMsgService) SpringUtils.getBean("chatMsgServiceImpl");
-        RedisUtils redisUtils = (RedisUtils) SpringUtils.getBean("redisUtils");
-        ObjectMapper objectMapper = SpringUtils.getBean(ObjectMapper.class);
 
         // 消息类型
         JsonNode rootNode = objectMapper.readTree(msg.text());

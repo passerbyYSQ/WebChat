@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 暂时不要用
- *
  * @Description: 自定义响应结构, 转换类
  */
 public class JsonUtils {
@@ -20,10 +18,8 @@ public class JsonUtils {
     private static final ObjectMapper MAPPER;
 
     static {
-        // 没有办法在静态代码块中获取我们的bean
-//        MAPPER = SpringUtils.getBean(ObjectMapper.class);
-        // 这个与Spring管理的被我们配置过的mapper不一样
-        MAPPER = new ObjectMapper();
+        MAPPER = SpringUtils.getBean(ObjectMapper.class);
+//        MAPPER = new ObjectMapper();
     }
 
     /**

@@ -1,7 +1,5 @@
 package net.ysq.webchat.netty;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.channel.Channel;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
@@ -9,7 +7,7 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import net.ysq.webchat.netty.entity.MsgModel;
-import net.ysq.webchat.utils.SpringUtils;
+import net.ysq.webchat.utils.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.ObjectUtils;
@@ -95,13 +93,7 @@ public class UserChannelRepository {
         Channel receiverChannel = isOnline(receiverId);
         if (!ObjectUtils.isEmpty(receiverChannel)) {
             // 在线，就推送；离线，不做处理
-            ObjectMapper mapper = SpringUtils.getBean(ObjectMapper.class);
-            String json = null;
-            try {
-                json = mapper.writeValueAsString(msgModel);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
+            String json = JsonUtils.objectToJson(msgModel);
             TextWebSocketFrame frame = new TextWebSocketFrame(json);
             receiverChannel.writeAndFlush(frame);
         } else {

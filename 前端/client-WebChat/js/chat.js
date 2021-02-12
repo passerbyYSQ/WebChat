@@ -81,8 +81,8 @@ window.CHAT = {
 			if (app.isNotBlank(msgList)) {
 				var isRead = app.isNotNull(chattingView); // 不为空(true)，表示停留在聊天页面，那么当前收到的消息已读(true)
 				var lastMsg = msgList[msgList.length - 1]; 
-				// lastMsg.createTime是一个字符串
-				var timestamp = app.getDateTimeStamp(lastMsg.createTime);
+				// lastMsg.time是一个字符串
+				var timestamp = app.getDateTimeStamp(lastMsg.time);
 				app.saveUserChatSnapshot(myId, lastMsg.senderId, lastMsg.content, isRead, timestamp); // 我发送的消息，对于我来说，肯定是已读的
 				chatListView.evalJS("updateChatSnapshot('" + lastMsg.senderId + "', '" 
 					+ lastMsg.content +"', " + isRead + ", " + timestamp + ")");
