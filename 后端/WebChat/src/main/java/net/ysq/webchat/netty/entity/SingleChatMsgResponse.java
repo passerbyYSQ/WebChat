@@ -21,7 +21,7 @@ public class SingleChatMsgResponse {
     // 消息的具体内容
     private String content;
 
-    private LocalDateTime time;
+    private LocalDateTime createTime;
 
     public SingleChatMsgResponse() {
     }
@@ -30,7 +30,7 @@ public class SingleChatMsgResponse {
         this.senderId = chatMsg.getSendUserId();
         this.msgId = chatMsg.getId();
         this.content = chatMsg.getMsg();
-        this.time = chatMsg.getCreateTime();
+        this.createTime = chatMsg.getCreateTime();
     }
 
     public String getSenderId() {
@@ -57,11 +57,11 @@ public class SingleChatMsgResponse {
         this.content = content;
     }
 
-    public LocalDateTime getTime() {
-        return time;
+    public LocalDateTime getCreateTime() {
+        return createTime;
     }
 
-    public void setTime(LocalDateTime time) {
-        this.time = time;
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
     }
 }

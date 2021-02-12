@@ -13,15 +13,16 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<!-- 打包方式为war包	-->
 	<packaging>war</packaging>
+
 	<name>WebChat</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
 		<java.version>1.8</java.version>
 
-		<!--	使用1.1.10，lastSendRequestTime会报错java.sql.SQLFeatureNotSupportedException: null
+		<!--	使用1.1.10，datetime转LocalDatetime会报错java.sql.SQLFeatureNotSupportedException: null
 			https://blog.csdn.net/sinat_14977855/article/details/104042952-->
-		<druid.version>1.1.20</druid.version>
+		<druid.version>1.1.21</druid.version>
 		<mybatis.version>2.1.4</mybatis.version>
 		<tk-mapper.version>2.1.5</tk-mapper.version>
 		<jwt.version>3.3.0</jwt.version>
@@ -30,7 +31,6 @@
 		<pagehelper.version>1.2.13</pagehelper.version>
 		<netty.version>4.1.50.Final</netty.version>
 		<mica.version>2.4.1-GA</mica.version>
-<!--		<mica.css.version></mica.css.version>-->
 	</properties>
 
 	<dependencies>
@@ -63,12 +63,12 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
-<!--			<exclusions>-->
-<!--				<exclusion>-->
-<!--					<groupId>org.springframework.boot</groupId>-->
-<!--					<artifactId>spring-boot-starter-tomcat</artifactId>-->
-<!--				</exclusion>-->
-<!--			</exclusions>-->
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-tomcat</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/io.netty/netty-all -->
@@ -181,13 +181,16 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-<!--				<executions>-->
-<!--					<execution>-->
-<!--						<goals>-->
-<!--							<goal>repackage</goal>-->
-<!--						</goals>-->
-<!--					</execution>-->
-<!--				</executions>-->
+				<configuration>
+					<mainClass>net.ysq.webchat.WebChatApplication</mainClass>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
             <!--
                 mybatis逆向工程插件

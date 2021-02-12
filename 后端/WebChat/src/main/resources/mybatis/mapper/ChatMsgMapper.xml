@@ -20,7 +20,7 @@
         id msgId,
         send_user_id senderId,
         msg content,
-        create_time time
+        create_time createTime
     from chat_msg
     where accept_user_id=#{receiverId} and sign_flag=0
     order by create_time
