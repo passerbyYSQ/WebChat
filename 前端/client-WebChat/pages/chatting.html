@@ -149,9 +149,9 @@
 			
 			function sendMsg(msg) {
 				// 1、转义处理，2、换行符替换
-				escapedMsg = app.htmlEscape(msg);
+				var escapedMsg = app.htmlEscape(msg);
 				var reg = new RegExp("\r|\n|\r\n", "gm"); 
-				escapedMsg = msg.replace(reg, "<br/>");
+				escapedMsg = escapedMsg.replace(reg, "<br/>");
 				
 				var msgList = document.getElementById("msgList");
 				var msgHtml = "<div class='me-msg'><div class='content-box'><p>" + escapedMsg + "</p></div><img src='" + me.faceImage + "'></div>";
@@ -161,7 +161,7 @@
 				scrollToBottom();
 				// netty 推送
 				
-				// 构建消息实体。发送的时候，是处理的msg
+				// 构建消息实体。发送消息给别人的是没有处理的msg，将转义和换行符替换的工作交给服务端
 				var msgModel = new app.MsgModel(app.action.CHAT, {
 					receiverId: friend.userId,
 					content: msg
@@ -169,6 +169,7 @@
 				var wsView = plus.webview.getWebviewById("chat_list");
 				wsView.evalJS("CHAT.send('" + JSON.stringify(msgModel) + "')");
 				
+				// 本地消息的存储和显示，需要app自己做转义和换行符替换的处理
 				var timestamp = new Date().getTime();
 				// 将聊天记录保存到本地缓存
 				app.saveUserChatHistory(me.id, friend.userId, escapedMsg, 1); // 1：我发送的

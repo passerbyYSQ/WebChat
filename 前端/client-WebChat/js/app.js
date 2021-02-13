@@ -2,7 +2,7 @@ window.app = {
 	/**
 	 * netty服务后端发布的url地址
 	 */
-	nettyServerUrl: 'ws://192.168.0.107:8081/ws',
+	nettyServerUrl: 'ws://119.45.164.115:8081/ws',
 	
 	/**
 	 * 后端服务发布的url地址
@@ -10,7 +10,7 @@ window.app = {
 	 * 开发时，服务端和测试手机需要在同一局域网。此处的ip是服务端所在电脑的局域网ip
 	 * 由于是动态分配，所以ip可能会变
 	 */
-	serverUrl: "http://192.168.0.107:8080/v1/api/",  
+	serverUrl: "http://119.45.164.115:8080/v1/api/",  
 	
 	/**
 	 * 判断字符串是否为空
