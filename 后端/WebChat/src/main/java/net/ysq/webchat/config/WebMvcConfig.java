@@ -1,8 +1,8 @@
 package net.ysq.webchat.config;
 
-import net.ysq.webchat.component.LoginInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -22,7 +22,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/**")
                 // 路径不包括contextPath部分
-                .excludePathPatterns("/user/login", "/user/logout", "/index/test1");
+                .excludePathPatterns("/user/login",
+                        "/index/**", "/error");
     }
 
     /**
@@ -36,5 +37,16 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .allowedOrigins("*")
                 .allowedMethods("GET", "POST", "PUT", "OPTIONS", "DELETE", "PATCH")
                 .allowCredentials(true).maxAge(3600);
+    }
+
+    /**
+     * 在参数绑定时，自定义String->String的转换器，
+     * 在转换逻辑中对参数值进行转义，从而达到防XSS的效果
+     *
+     * @param registry
+     */
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        registry.addConverter(new EscapeStringConverter());
     }
 }

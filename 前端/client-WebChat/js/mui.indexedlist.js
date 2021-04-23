@@ -136,6 +136,7 @@
 					var text = (item.innerText || '').toLowerCase();
 					var value = (item.getAttribute('data-value') || '').toLowerCase();
 					var tags = (item.getAttribute('data-tags') || '').toLowerCase();
+					
 					if (keyword && text.indexOf(keyword) < 0 &&
 						value.indexOf(keyword) < 0 &&
 						tags.indexOf(keyword) < 0) {

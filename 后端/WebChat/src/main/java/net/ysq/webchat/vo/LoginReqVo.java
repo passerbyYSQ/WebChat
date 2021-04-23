@@ -1,5 +1,6 @@
 package net.ysq.webchat.vo;
 
+import lombok.Data;
 import net.ysq.webchat.common.Constant;
 import org.hibernate.validator.constraints.Length;
 
@@ -12,6 +13,7 @@ import javax.validation.constraints.Pattern;
  * @author passerbyYSQ
  * @create 2021-01-29 1:19
  */
+@Data
 public class LoginReqVo {
 
     @NotBlank
@@ -26,30 +28,5 @@ public class LoginReqVo {
     // 设备唯一标识
 //    @NotBlank
     private String cid;
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-
-    public String getCid() {
-        return cid;
-    }
-
-    public void setCid(String cid) {
-        this.cid = cid;
-    }
 
 }

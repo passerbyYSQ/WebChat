@@ -1,5 +1,7 @@
 package net.ysq.webchat.netty.entity;
 
+import lombok.Data;
+
 /**
  * 单聊消息的请求格式
  * 由前端传来
@@ -7,6 +9,7 @@ package net.ysq.webchat.netty.entity;
  * @author passerbyYSQ
  * @create 2021-02-08 15:29
  */
+@Data
 public class SingleChatMsgRequest {
 
     // 接收者的用户id
@@ -15,19 +18,4 @@ public class SingleChatMsgRequest {
     // 消息的具体内容
     private String content;
 
-    public String getReceiverId() {
-        return receiverId;
-    }
-
-    public void setReceiverId(String receiverId) {
-        this.receiverId = receiverId;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
 }

@@ -18,23 +18,26 @@ import org.springframework.stereotype.Component;
 @Component  // 注意不要忘了！！！
 public class WebSocketServer {
 
+    /**
+     * 静态内部类方式实现懒汉式单例模式
+     */
     private static class SingletonWSServer {
-        static final WebSocketServer instance = new WebSocketServer();
+        private static final WebSocketServer instance = new WebSocketServer();
     }
 
     // 获取单例的方法
     public static WebSocketServer getInstance() {
-        return SingletonWSServer.instance;
+        return SingletonWSServer.instance; // 此时才会加载内部类，所以是懒汉式
     }
 
-    private EventLoopGroup bossGroup;
-    private EventLoopGroup workerGroup;
     private ServerBootstrap server;
-    private ChannelFuture future;
 
-    public WebSocketServer() {
-        bossGroup = new NioEventLoopGroup(1);
-        workerGroup = new NioEventLoopGroup();
+    /**
+     *
+     */
+    private WebSocketServer() {
+        EventLoopGroup bossGroup = new NioEventLoopGroup(1);
+        EventLoopGroup workerGroup = new NioEventLoopGroup();
         server = new ServerBootstrap();
         server.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
@@ -43,7 +46,7 @@ public class WebSocketServer {
     }
 
     public void start() {
-        future = server.bind(8081);
+        ChannelFuture future = server.bind(8081);
         future.addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {

@@ -1,5 +1,6 @@
 package net.ysq.webchat.netty.entity;
 
+import lombok.Data;
 import net.ysq.webchat.po.ChatMsg;
 
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
  * @author passerbyYSQ
  * @create 2021-02-08 15:43
  */
+@Data
 public class SingleChatMsgResponse {
 
     private String senderId;
@@ -33,35 +35,4 @@ public class SingleChatMsgResponse {
         this.createTime = chatMsg.getCreateTime();
     }
 
-    public String getSenderId() {
-        return senderId;
-    }
-
-    public void setSenderId(String senderId) {
-        this.senderId = senderId;
-    }
-
-    public String getMsgId() {
-        return msgId;
-    }
-
-    public void setMsgId(String msgId) {
-        this.msgId = msgId;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public LocalDateTime getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(LocalDateTime createTime) {
-        this.createTime = createTime;
-    }
 }

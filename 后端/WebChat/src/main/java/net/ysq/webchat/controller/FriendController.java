@@ -12,10 +12,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 
@@ -39,14 +39,14 @@ public class FriendController {
      * 获取我的好友列表（Contact）
      */
     @GetMapping("list")
-    public ResultModel<List<FriendCard>> friendList(HttpServletRequest request) {
-        String myId = (String) request.getAttribute("userId");
+    public ResultModel<List<FriendCard>> friendList(@RequestAttribute("userId") String myId) {
         List<FriendCard> friendList = friendService.getFriendList(myId);
         return ResultModel.success(friendList);
     }
 
     @GetMapping("isFriend")
-    public ResultModel<Boolean> isMyFriend(@NotBlank String userId, HttpServletRequest request) {
+    public ResultModel<Boolean> isMyFriend(@NotBlank String userId,
+                                           @RequestAttribute("userId") String myId) {
         // 判断userId是否合法
         User user = userService.getUserById(userId);
         if (ObjectUtils.isEmpty(user)) {
@@ -54,7 +54,6 @@ public class FriendController {
         }
 
         boolean isFriend;
-        String myId = (String) request.getAttribute("userId");
         if (myId.equals(user.getId())) {
             isFriend = true; // 自己是自己的好友。不可添加
         } else {

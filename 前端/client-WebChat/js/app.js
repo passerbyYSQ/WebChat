@@ -2,15 +2,15 @@ window.app = {
 	/**
 	 * netty服务后端发布的url地址
 	 */
-	nettyServerUrl: 'ws://119.45.164.115:8081/ws',
+	nettyServerUrl: 'ws://10.252.74.250:8081/ws',
 	
 	/**
 	 * 后端服务发布的url地址
-	 * 注意：由于我们封装了ajax请求，所以最后的/不能少
+	 * 注意：由于我们封装了ajax请求，所以最后的/不能少！！！
 	 * 开发时，服务端和测试手机需要在同一局域网。此处的ip是服务端所在电脑的局域网ip
 	 * 由于是动态分配，所以ip可能会变
 	 */
-	serverUrl: "http://119.45.164.115:8080/v1/api/",  
+	serverUrl: "http://10.252.74.250:8080/v1/api/",  
 	
 	/**
 	 * 判断字符串是否为空
@@ -115,8 +115,7 @@ window.app = {
 	 * 封装ajax请求,携带token。
 	 * 必须要在plusReady()事件之后调用
 	 */
-	ajax: function(url, data, successCallback, type = "post", 
-		errorCallback = function() {}, 
+	ajax: function(url, data, successCallback, type = "post", errorCallback = function() {}, 
 		failedCallback = function(res) { app.showToast(res.msg, "error"); }) {
 			
 		plus.nativeUI.showWaiting("Loading...");
@@ -126,7 +125,7 @@ window.app = {
 			token = user.token;
 		}
 		// console.log(token);
-		var _this = this;
+		//var _this = this;
 		mui.ajax(this.serverUrl + url, {
 			type: type,
 			dataType: "json",
@@ -136,26 +135,36 @@ window.app = {
 			headers: {
 				token: token // 携带token
 			},
-			success: function(res) {
+			success: function(res, textStatus, xhr) {
 				console.log("success");
 				console.log(JSON.stringify(res));
 				plus.nativeUI.closeWaiting();
 				if (res.code !== 2000) { // 与后端约定：成功的业务状态的请求统一返回2000
+					if (res.code === 6201) { // 强制下线
+						var meView = plus.webview.getWebviewById("me");
+						meView.evalJS("openLoginPage()");
+					}
 					failedCallback(res); // 业务失败
 				} else {
+					// 判断是否签发了新的token。如果是，更新token
+					var header = xhr.getAllResponseHeaders();
+					if (app.isNotBlank()) { // 不能少!!!
+						user.token = header.token;
+						app.setUserGlobalInfo(user);
+					}
 					successCallback(res); // 业务成功
 				}
 			},
-			error: function(xhr, textStatus, errorThrown) {
+			error: function(xhr, type, errorThrown) {
 				console.log("error");
 				plus.nativeUI.closeWaiting();
-				if (textStatus == "timeout") {
+				if (type == "timeout") {
 					app.showToast("连接超时", "error");
-				} else if (textStatus == "error") {
+				} else if (type == "error") {
 					app.showToast("服务端错误", "error");
 				}
 				if (errorCallback != null) {
-					errorCallback(xhr, textStatus, errorThrown);
+					errorCallback(xhr, type, errorThrown);
 				}
 			}
 		});
@@ -244,13 +253,18 @@ window.app = {
 	 * 退出登录
 	 */
 	userLogout: function(){
+		console.log("退出登录");
+		
+		var chatListView = plus.webview.getWebviewById("chat_list");
+		chatListView.evalJS("CHAT.socket.close()");
 		plus.storage.removeItem("userInfo");
+		
 		// 还要清除联系人列表的缓存
 		var webviews = plus.webview.all();
 		for(var i=0; i<webviews.length; i++) {
-			if (webviews[i].id !== 'login') {
+			if (webviews[i].id != "login") { // from页面先不要关闭。如果全部页面关闭会导致app退出
 				webviews[i].close();
-			}
+			} 
 		}
 	},
 	
@@ -306,7 +320,8 @@ window.app = {
 		SIGNED: 3, // 消息签收
 		KEEP_ALIVE: 4, // 心跳
 		PULL_FRIEND: 5, // 拉取好友
-		FRIEND_REQUEST: 6  // 请求添加为好友
+		FRIEND_REQUEST: 6, // 请求添加为好友
+		FORCE_OFFLINE: 7 // 强制下线
 	},
 	MsgModel: function(action, data) {
 		this.action = action;

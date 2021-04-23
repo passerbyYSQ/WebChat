@@ -20,12 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 
@@ -53,7 +49,7 @@ public class FriendRequestController {
      */
     @PostMapping("process")
     public ResultModel<String> updateRequestStatus(@NotBlank String requestId, @Range(min = 0, max = 3) byte status,
-                                           HttpServletRequest request) {
+                                                   @RequestAttribute("userId") String myId) {
         // requestId合法性检查
         FriendRequest friendRequest = friendRequestService.getOneFriendRequest(requestId);
         if (ObjectUtils.isEmpty(friendRequest)) { // 好友申请不存在，可能因为requestId错误
@@ -65,7 +61,6 @@ public class FriendRequestController {
             return ResultModel.failed(StatusCode.REPEAT_PROCESS);
         }
 
-        String myId = (String) request.getAttribute("userId");
         // 没有权限修改其他人的好友申请
         if (!friendRequest.getAcceptUserId().equals(myId)) {
             return ResultModel.failed(StatusCode.NO_PERM);
@@ -105,11 +100,10 @@ public class FriendRequestController {
      * @param count     每一页显示的数量
      */
     @GetMapping("list")
-    public ResultModel<PageData<FriendRequestCard>> friendRequestList(Integer page, Integer count,
-                                                                      HttpServletRequest request) {
-        if (ObjectUtils.isEmpty(page)) { // 如果为空，给个默认值
-            page = 1;
-        }
+    public ResultModel<PageData<FriendRequestCard>> friendRequestList(
+            @RequestParam(defaultValue = "1") Integer page, Integer count,
+            @RequestAttribute("userId") String myId) {
+
         // page 是否越界，可不需要判断，PageHelper内部会判断并纠正
         if (ObjectUtils.isEmpty(count) || count <= 0) {
             count = 10;
@@ -119,7 +113,6 @@ public class FriendRequestController {
         // 紧跟在这个方法后的第一个MyBatis 查询方法会被进行分页
         PageHelper.startPage(page, count);
 
-        String myId = (String) request.getAttribute("userId");
         // 查询
         List<FriendRequestCard> friendRequestList = friendRequestService.getFriendRequestList(myId);
 
@@ -138,9 +131,8 @@ public class FriendRequestController {
      */
     @PostMapping("send")
     public ResultModel sendFriendRequest(@NotBlank String receiverId, String content,
-                                         HttpServletRequest request) {
+                                         @RequestAttribute("userId") String myId) {
         // 不能给自己发送好友申请
-        String myId = (String) request.getAttribute("userId");
         if (myId.equals(receiverId)) {
             return ResultModel.failed(StatusCode.CAN_NOT_ADD_SELF);
         }

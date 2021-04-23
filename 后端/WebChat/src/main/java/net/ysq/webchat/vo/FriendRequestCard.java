@@ -1,5 +1,7 @@
 package net.ysq.webchat.vo;
 
+import lombok.Data;
+
 import java.time.LocalDateTime;
 
 /**
@@ -8,6 +10,7 @@ import java.time.LocalDateTime;
  * @author passerbyYSQ
  * @create 2021-02-02 23:13
  */
+@Data
 public class FriendRequestCard {
 
     private String id; // 申请的id
@@ -18,59 +21,4 @@ public class FriendRequestCard {
     private byte status; // 状态
     private LocalDateTime requestTime;
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getSenderId() {
-        return senderId;
-    }
-
-    public void setSenderId(String senderId) {
-        this.senderId = senderId;
-    }
-
-    public String getSenderUsername() {
-        return senderUsername;
-    }
-
-    public void setSenderUsername(String senderUsername) {
-        this.senderUsername = senderUsername;
-    }
-
-    public String getSenderFaceImg() {
-        return senderFaceImg;
-    }
-
-    public void setSenderFaceImg(String senderFaceImg) {
-        this.senderFaceImg = senderFaceImg;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public byte getStatus() {
-        return status;
-    }
-
-    public void setStatus(byte status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getRequestTime() {
-        return requestTime;
-    }
-
-    public void setRequestTime(LocalDateTime requestTime) {
-        this.requestTime = requestTime;
-    }
 }

@@ -68,6 +68,7 @@ public class UserServiceImpl implements UserService {
 
         // 更新oss中的二维码
         String qrCodeUrl = generateAndUploadQRCode(userId, user.getFaceImageBig(), userId);
+        // 获取当前时间戳，拼接到图片url后面。防止因为前端网页因为缓存不请求同一路径的图片
         String timestamp = "timestamp=" + System.currentTimeMillis();
         user.setQrcode(qrCodeUrl + "?" + timestamp);
 

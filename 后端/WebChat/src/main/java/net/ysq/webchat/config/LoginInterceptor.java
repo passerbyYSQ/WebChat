@@ -1,18 +1,23 @@
-package net.ysq.webchat.component;
+package net.ysq.webchat.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.ysq.webchat.common.ResultModel;
 import net.ysq.webchat.common.StatusCode;
+import net.ysq.webchat.service.UserService;
+import net.ysq.webchat.utils.DateTimeUtils;
 import net.ysq.webchat.utils.JwtUtils;
 import net.ysq.webchat.utils.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 /**
  * @author passerbyYSQ
@@ -26,6 +31,9 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 
     @Autowired
     private RedisUtils redisUtils;
+
+    @Autowired
+    private UserService userService;
 
     private HttpServletResponse response;
 
@@ -45,24 +53,32 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
             // 如果没有抛出异常，表示token有效。则在Redis中寻找对应的登录信息
             String userId = JwtUtils.getClaimByKey(token, "userId");
             String redisToken = (String) redisUtils.get("user:" + userId);
-            if (StringUtils.isEmpty(redisToken)) {
-                // 一份未过期的token重复提交过来（客户端没有即时清除），redisToken为null。因为redis中的key已被删除
-                writeJson(ResultModel.failed(StatusCode.TOKEN_IS_INVALID));
-                return false;
-            }
 
             // 将来自客户端的token与redis中的token进行比较
             // 如果不一致，说明账号被其他人在其他地方登录了。拦截该请求，要求重新登录
-            if (!token.equals(redisToken)) {
+            if (!ObjectUtils.isEmpty(redisToken) && !token.equals(redisToken)) {
                 writeJson(ResultModel.failed(StatusCode.FORCED_OFFLINE));
                 return false;
             }
+
+            // 刷新token
+            refreshToken(token, userId);
 
             // 如果最终来到这里，则放行请求
             // 在放行之前，将用户信息userId放到request，方便controller中取用
             request.setAttribute("userId", userId);
 
             return true;
+        }
+    }
+
+    private void refreshToken(String token, String userId) {
+        LocalDateTime expireAt = DateTimeUtils.toLocalDateTime(JwtUtils.getExpireAt(token));
+        // 当前时间距离token过期还有多少天
+        long days = DateTimeUtils.dif(LocalDateTime.now(), expireAt, ChronoUnit.DAYS);
+        if (days < 1) { // 如果不足一天，则签发新的token。放到响应头中
+            String newToken = userService.generateAndSaveToken(userId);
+            response.setHeader("token", newToken);
         }
     }
 

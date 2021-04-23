@@ -78,6 +78,14 @@
 						var users = res.data;
 						if (users.length == 0) {
 							app.showToast("搜索不到用户", "error");
+						} else if (users.length == 1) {
+							mui.openWindow({
+							   url: "add_friend.html",
+							   id: "add_friend",
+							   extras: {
+								   receiverId: users[0].id
+							   }
+							});
 						} else {
 							refreshUserList(users);
 						}

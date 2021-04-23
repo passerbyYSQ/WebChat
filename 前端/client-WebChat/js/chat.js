@@ -86,16 +86,27 @@ window.CHAT = {
 				app.saveUserChatSnapshot(myId, lastMsg.senderId, lastMsg.content, isRead, timestamp); // 我发送的消息，对于我来说，肯定是已读的
 				chatListView.evalJS("updateChatSnapshot('" + lastMsg.senderId + "', '" 
 					+ lastMsg.content +"', " + isRead + ", " + timestamp + ")");
+				// 收到消息的提示音
+				var audioPlayer = plus.audio.createPlayer("../mp3/receive.mp3");
+				audioPlayer.play();
 			}
 		
 		} else if (action == app.action.FRIEND_REQUEST) {
 			// 有新的好友申请
-			var chatListView = plus.webview.getWebviewById("chat_list");
 			chatListView.evalJS("loadRequestList()");
-		} 
+			
+		} else if (action == app.action.FORCE_OFFLINE) {
+			// 强制下线
+			app.showToast(msgModel.data);
+			var meView = plus.webview.getWebviewById("me");
+			meView.evalJS("openLoginPage()");
+		}
 	},
 	wsclose: function() {
 		console.log("连接已关闭");
+		CHAT.socket.close();
+		clearInterval(CHAT.heartBeatTimer);
+		console.log("心跳定时器已关闭");
 	},
 	wserror: function() {
 		// 连接失败，会回调到这里
@@ -109,7 +120,7 @@ window.CHAT = {
 		// 发送心跳包
 		return setInterval(function() {
 			CHAT.socket.send(JSON.stringify(msgModel));
-			// console.log("已发送心跳包：" + new Date());
+			// console.log("心跳包");
 		}, 10000); // 每隔10秒（必须小与后端定义的超时时间）发送一个心跳包
 		
 	},
@@ -122,6 +133,6 @@ window.CHAT = {
 		// 2、界面更新。由于局部更新太麻烦了，这里重新构建并刷新html
 		contactView.evalJS("showContactList()");
 		// 3、插入一条空的快照。需要在更新本地缓存之后。但是更新本地缓存是个异步操作，故不能写在这里
-		
+
 	}
 };

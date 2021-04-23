@@ -114,6 +114,10 @@
 							return app.showToast(res.msg, "error");
 						}
 						app.setUserGlobalInfo(res.data); // 存储用户信息
+						var welcomeView = plus.webview.getWebviewById("HBuilder");
+						if (app.isNotNull(welcomeView)) {
+							welcomeView.close();
+						}
 						mui.openWindow({ url: "index.html", id: "index" });
 					},
 					error: function(xhr, textStatus, errorThrown) {

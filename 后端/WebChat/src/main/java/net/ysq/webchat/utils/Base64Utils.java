@@ -1,12 +1,11 @@
 package net.ysq.webchat.utils;
 
-import java.io.ByteArrayInputStream;
+import lombok.Data;
+import org.springframework.util.FileCopyUtils;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
 import java.util.Base64;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,10 +39,20 @@ public class Base64Utils {
         String suffix = matcher.group(2); // 取出图片的后缀
         String data = matcher.group(3); // 取出数据部分
 
+        // 使用Spring提供的工具类来操作流
         File tmpFile = new File(destDir, fileName + "." + suffix);
         byte[] bytes = Base64.getDecoder().decode(data);
+        try {
+            FileOutputStream outStream = new FileOutputStream(tmpFile, true);
+            FileCopyUtils.copy(bytes, outStream);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
 
         // 流的拷贝，可以使用原始的bio方式。在这里使用nio的通道相关的API来操作
+        /*
         ReadableByteChannel inChannel = Channels.newChannel(new ByteArrayInputStream(bytes));
         FileChannel outChannel = null;
         try {
@@ -56,6 +65,7 @@ public class Base64Utils {
         } finally {
             CloseUtils.close(inChannel, outChannel);
         }
+        */
     }
 
     /**
@@ -75,28 +85,13 @@ public class Base64Utils {
         return new Base64DataBean(suffix, bytes);
     }
 
+    @Data
     static public class Base64DataBean {
         String suffix;
         byte[] bytes;
 
         public Base64DataBean(String suffix, byte[] bytes) {
             this.suffix = suffix;
-            this.bytes = bytes;
-        }
-
-        public String getSuffix() {
-            return suffix;
-        }
-
-        public void setSuffix(String suffix) {
-            this.suffix = suffix;
-        }
-
-        public byte[] getBytes() {
-            return bytes;
-        }
-
-        public void setBytes(byte[] bytes) {
             this.bytes = bytes;
         }
     }

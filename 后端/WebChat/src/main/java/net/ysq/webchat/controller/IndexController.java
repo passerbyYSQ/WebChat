@@ -1,9 +1,7 @@
 package net.ysq.webchat.controller;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author passerbyYSQ
@@ -13,6 +11,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("index")
 @ResponseBody
 public class IndexController {
+
+    @PostMapping("post")
+    public String testPost(@RequestBody String wd) {
+        System.out.println(wd);
+        return wd;
+    }
 
     @GetMapping("test1")
     public String testXss(String wd) {

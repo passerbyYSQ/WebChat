@@ -34,6 +34,7 @@ public class WsChannelInitializer extends ChannelInitializer<SocketChannel> {
 
 
                 // 自定义的业务的handler
+//                .addLast(new CheckBindHandler())
                 .addLast(new TextMsgHandler());
     }
 }

@@ -1,11 +1,14 @@
 package net.ysq.webchat.common;
 
+import lombok.Data;
+
 import java.time.LocalDateTime;
 
 /**
  * @author passerbyYSQ
  * @create 2020-11-01 21:04
  */
+@Data
 public class ResultModel<T>  {
 
     // 状态码
@@ -52,36 +55,6 @@ public class ResultModel<T>  {
         return failed(code.getCode(), code.getMsg());
     }
 
-    public Integer getCode() {
-        return code;
-    }
 
-    public void setCode(Integer code) {
-        this.code = code;
-    }
-
-    public String getMsg() {
-        return msg;
-    }
-
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
-
-    public T getData() {
-        return data;
-    }
-
-    public void setData(T data) {
-        this.data = data;
-    }
-
-    public LocalDateTime getTime() {
-        return time;
-    }
-
-    public void setTime(LocalDateTime time) {
-        this.time = time;
-    }
 
 }

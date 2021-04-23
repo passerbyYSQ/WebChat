@@ -135,14 +135,12 @@
 			
 			function logout() {
 				app.ajax("user/logout", null, function(res) {
-					var chatListView = plus.webview.getWebviewById("chat_list");
-					chatListView.evalJS("CHAT.socket.close()");
-					//app.userLogout();
-					mui.openWindow({
-						url: 'login.html',
-						id: 'login'
-					});
-				}, "post")
+					openLoginPage();
+				}, "post");
+			}
+			
+			function openLoginPage() {
+				mui.openWindow({ url: "login.html", id: "login" });
 			}
 			
 			// 刷新用户信息

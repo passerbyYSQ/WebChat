@@ -4,14 +4,12 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import net.ysq.webchat.common.ResultModel;
 import net.ysq.webchat.common.StatusCode;
-import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -27,8 +25,7 @@ import java.util.Set;
  */
 @ControllerAdvice
 @ResponseBody
-@ResponseStatus(HttpStatus.BAD_REQUEST)
-public class GlobalExceptionAdvice {
+public class GlobalExceptionHandler {
 
     // 参数校验不通过的异常统一捕获处理
     @ExceptionHandler(BindException.class)
@@ -46,6 +43,7 @@ public class GlobalExceptionAdvice {
                 joinErrorMsg(errors));
     }
 
+    // 拼接错误信息
     private String joinErrorMsg(List<FieldError> errors) {
         StringBuilder errorMsg = new StringBuilder();
         for (FieldError error : errors) {

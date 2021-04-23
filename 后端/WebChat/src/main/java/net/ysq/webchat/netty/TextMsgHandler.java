@@ -6,17 +6,17 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import lombok.extern.slf4j.Slf4j;
 import net.ysq.webchat.netty.entity.MsgActionEnum;
 import net.ysq.webchat.netty.entity.MsgModel;
 import net.ysq.webchat.netty.entity.SingleChatMsgRequest;
 import net.ysq.webchat.netty.entity.SingleChatMsgResponse;
 import net.ysq.webchat.po.ChatMsg;
 import net.ysq.webchat.service.ChatMsgService;
+import net.ysq.webchat.service.FriendService;
 import net.ysq.webchat.utils.JwtUtils;
 import net.ysq.webchat.utils.RedisUtils;
 import net.ysq.webchat.utils.SpringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.HtmlUtils;
@@ -30,15 +30,15 @@ import java.util.List;
  * @author passerbyYSQ
  * @create 2021-02-05 21:23
  */
+@Slf4j
 public class TextMsgHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
-
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {
-        logger.info("接收到的文本消息：{}", msg.text());
+        // json串
+        log.info("接收到的文本消息：{}", msg.text());
 
         ChatMsgService chatMsgService = (ChatMsgService) SpringUtils.getBean("chatMsgServiceImpl");
+        FriendService friendService = (FriendService) SpringUtils.getBean("friendServiceImpl");
         RedisUtils redisUtils = (RedisUtils) SpringUtils.getBean("redisUtils");
         ObjectMapper objectMapper = SpringUtils.getBean(ObjectMapper.class);
 
@@ -73,54 +73,59 @@ public class TextMsgHandler extends SimpleChannelInboundHandler<TextWebSocketFra
                     UserChannelRepository.pushMsg(userId, model);
                 }
             }
-            // 测试
-            UserChannelRepository.print();
-
-        } else if (action.equals(MsgActionEnum.CHAT.type)) {
-            // 2、聊天类型的消息，把消息保存到数据库，同时标记消息状态为[未签收]
-            SingleChatMsgRequest data = objectMapper.treeToValue(dataNode, SingleChatMsgRequest.class);
-            // 由于是通过websocket，而并非http协议，所以mica-xss的拦截器没有作用。此处需要我们自己转义
-            data.setContent(HtmlUtils.htmlEscape(data.getContent(), "UTF-8"));
-
-            // 对于聊天消息，channel所绑定的user是发送者
-            String senderId = UserChannelRepository.getUserId(channel);
-            // 如果是空的，说明绑定失败了（可能是token过期了）。不做处理
-            if (!StringUtils.isEmpty(senderId)) {
-                // 往消息表插入数据
-                ChatMsg chatMsg = chatMsgService.saveMsg(senderId, data);
-
-                // 构建消息实体
-                MsgModel<List<SingleChatMsgResponse>> model = new MsgModel<>();
-                model.setAction(MsgActionEnum.CHAT.type);
-                List<SingleChatMsgResponse> unsignedMsgList = new ArrayList<>();
-                unsignedMsgList.add(new SingleChatMsgResponse(chatMsg));
-                model.setData(unsignedMsgList);
-
-                // 推送消息
-                UserChannelRepository.pushMsg(data.getReceiverId(), model);
-            }
-
-        } else if (action.equals(MsgActionEnum.SIGNED.type)) {
-            // 3、签收消息的类型。针对具体的消息进行签收，修改数据库对应的消息状态为[已签收]
-            // 签收状态并非是指用户有没有读了消息。而是消息是否已经被推送到达用户的手机设备
-            // 在签收类型的消息中，代表需要签收的消息的id。多个id之间用,分隔
-            String msgIdsStr = objectMapper.treeToValue(dataNode, String.class);
-
-            // 对于要签收类型消息，只有是我收到的消息，我才能签收。所以我是接收者
-            String receiverId = UserChannelRepository.getUserId(channel);
-            if (!StringUtils.isEmpty(msgIdsStr)) {
-                String[] msgIds = msgIdsStr.split(",");
-                if (!ObjectUtils.isEmpty(msgIds)) {
-                    chatMsgService.signMsg(receiverId, msgIds);
-                }
-            }
 
         } else if (action.equals(MsgActionEnum.KEEP_ALIVE.type)) {
             // 4、心跳类型的消息
             // 假如客户端进程被正常退出，websocket主动断开连接，那么服务端对应的channel是会释放的
             // 但是如果客户端关闭网络后，重启网络，会导致服务端会再新建一个channel
             // 而旧的channel已经没用了，但是并没有被移除
-//            logger.info("收到来自于channel {} 的心跳包", channel.id().asLongText());
+            log.info("收到来自于channel {} 的心跳包", channel.id().asLongText());
+
+        } else if (UserChannelRepository.isBind(channel)) {
+            // 其他类型的消息需要绑定后才会处理
+
+            if (action.equals(MsgActionEnum.CHAT.type)) {
+                // 2、聊天类型的消息，把消息保存到数据库，同时标记消息状态为[未签收]
+                SingleChatMsgRequest data = objectMapper.treeToValue(dataNode, SingleChatMsgRequest.class);
+                // 由于是通过websocket，而并非http协议，所以并没有经过SpringMVC的参数绑定流程。此处需要我们自己转义
+                data.setContent(HtmlUtils.htmlEscape(data.getContent(), "UTF-8"));
+
+                // 对于聊天消息，channel所绑定的user是发送者
+                String senderId = UserChannelRepository.getUserId(channel);
+                // 如果是空的，说明绑定失败了（可能是token过期了）。不做处理
+                if (!StringUtils.isEmpty(senderId) &&
+                        // 且接收者是我的好友
+                        !ObjectUtils.isEmpty(friendService.getMyOneFriend(senderId, data.getReceiverId()))) {
+
+                    // 往消息表插入数据
+                    ChatMsg chatMsg = chatMsgService.saveMsg(senderId, data);
+
+                    // 构建消息实体
+                    MsgModel<List<SingleChatMsgResponse>> model = new MsgModel<>();
+                    model.setAction(MsgActionEnum.CHAT.type);
+                    List<SingleChatMsgResponse> unsignedMsgList = new ArrayList<>();
+                    unsignedMsgList.add(new SingleChatMsgResponse(chatMsg));
+                    model.setData(unsignedMsgList);
+
+                    // 推送消息
+                    UserChannelRepository.pushMsg(data.getReceiverId(), model);
+                }
+
+            } else if (action.equals(MsgActionEnum.SIGNED.type)) {
+                // 3、签收消息的类型。针对具体的消息进行签收，修改数据库对应的消息状态为[已签收]
+                // 签收状态并非是指用户有没有读了消息。而是消息是否已经被推送到达用户的手机设备
+                // 在签收类型的消息中，代表需要签收的消息的id。多个id之间用,分隔
+                String msgIdsStr = objectMapper.treeToValue(dataNode, String.class);
+
+                // 对于要签收类型消息，只有是我收到的消息，我才能签收。所以我是接收者
+                String receiverId = UserChannelRepository.getUserId(channel);
+                if (!StringUtils.isEmpty(msgIdsStr)) {
+                    String[] msgIds = msgIdsStr.split(",");
+                    if (!ObjectUtils.isEmpty(msgIds)) {
+                        chatMsgService.signMsg(receiverId, msgIds);
+                    }
+                }
+            }
         }
     }
 
@@ -132,7 +137,7 @@ public class TextMsgHandler extends SimpleChannelInboundHandler<TextWebSocketFra
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         UserChannelRepository.remove(ctx.channel());
-        logger.info("剩余通道个数：{}", UserChannelRepository.CHANNEL_GROUP.size());
+//        logger.info("剩余通道个数：{}", UserChannelRepository.CHANNEL_GROUP.size());
     }
 
     @Override
